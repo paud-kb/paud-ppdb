@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - PPDB PAUD Banjar</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #FFF9F5 0%, #FFE0B2 100%);
+      padding: 20px;
+      text-align: center;
+    }
+    .offline-card {
+      background: white;
+      border-radius: 28px;
+      padding: 48px 32px;
+      max-width: 420px;
+      box-shadow: 0 12px 40px rgba(255,107,157,0.15);
+    }
+    .offline-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+    h1 {
+      color: #37474F;
+      font-size: 1.6rem;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #78909C;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    .btn-retry {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #63D2BC 0%, #4FC3F7 100%);
+      color: white;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 20px rgba(99,210,188,0.3);
+    }
+    .btn-retry:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(99,210,188,0.4);
+    }
+    .tips {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 2px dashed #E0E0E0;
+      font-size: 0.85rem;
+      color: #9E9E9E;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-card">
+    <div class="offline-icon">📡</div>
+    <h1>Oops! Koneksi Terputus</h1>
+    <p>Sepertinya Anda sedang offline atau tidak ada koneksi internet.<br>Tenang, beberapa data sudah tersimpan di perangkat Anda!</p>
+    <a href="/" class="btn-retry" onclick="window.location.reload()">
+      <i class="fas fa-redo"></i> Coba Lagi
+    </a>
+    <div class="tips">
+      💡 <strong>Tips:</strong> Halaman yang sudah dibuka sebelumnya masih bisa dilihat meski offline.
+    </div>
+  </div>
+</body>
+</html>

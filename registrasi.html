@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a1628">
+  <title>Registrasi Admin Sekolah - PPDB PAUD Banjar</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a2332;
+      --bg-input: #0f172a;
+      --border-color: #2d3a4f;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-glow: rgba(16,185,129,0.25);
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --success: #10b981;
+      --gradient-primary: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.35);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .reg-container { width: 100%; max-width: 500px; }
+
+    .reg-header { text-align: center; margin-bottom: 28px; }
+    
+    .reg-logo {
+      width: 72px; height: 72px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-lg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 30px rgba(16,185,129,0.35);
+    }
+
+    .reg-title {
+      font-family: var(--font-heading);
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .reg-subtitle { color: var(--text-secondary); font-size: 0.92rem; }
+
+    .reg-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 32px 28px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Info Box */
+    .info-box {
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.88rem;
+      color: var(--info);
+    }
+
+    .info-box i { margin-top: 2px; }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-label .required { color: var(--danger); margin-left: 3px; }
+
+    .input-wrapper { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 15px;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      background: var(--bg-input);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-input::placeholder { color: var(--text-muted); }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(16,185,129,0.12);
+    }
+
+    .input-wrapper:focus-within .input-icon { color: var(--accent); }
+
+    .form-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      display: block;
+    }
+
+    /* Button */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--gradient-primary);
+      border: none;
+      border-radius: var(--radius-full);
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(16,185,129,0.3);
+      margin-top: 8px;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(16,185,129,0.45);
+    }
+
+    .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .spinner-small {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Alert */
+    .alert {
+      display: none;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+      align-items: center;
+      gap: 10px;
+      animation: shake 0.4s ease;
+    }
+
+    .alert.show { display: flex; }
+    .alert-error { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; }
+    .alert-success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); color: #6ee7b7; }
+    .alert-warning { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); color: #fcd34d; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    /* Success Section */
+    .success-section {
+      display: none;
+      text-align: center;
+      padding: 28px 0;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .success-section.show { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .success-icon-big {
+      width: 80px; height: 80px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 30px rgba(16,185,129,0.35);
+    }
+
+    .success-title {
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .success-subtitle { color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 8px; }
+
+    .request-number-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-input);
+      border: 2px dashed var(--border-color);
+      padding: 14px 24px;
+      border-radius: var(--radius-full);
+      margin: 18px 0;
+    }
+
+    .request-number-label { font-size: 0.82rem; color: var(--text-muted); }
+    .request-number-value {
+      font-family: monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 2px;
+    }
+
+    .next-steps {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-top: 24px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .step-item:last-child { border-bottom: none; }
+
+    .step-number {
+      width: 26px; height: 26px;
+      background: var(--bg-input);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      margin-top: 24px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--accent); }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .toast {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      border-left: 4px solid var(--accent);
+      animation: slideInRight 0.3s ease;
+      max-width: 380px;
+    }
+
+    .toast.error { border-left-color: var(--danger); }
+    .toast.success { border-left-color: var(--success); }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 520px) {
+      .reg-card { padding: 24px 20px; }
+      .reg-title { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="reg-container">
+  
+  <!-- Header -->
+  <div class="reg-header">
+    <div class="reg-logo">🏫</div>
+    <h1 class="reg-title">Registrasi Admin Sekolah</h1>
+    <p class="reg-subtitle">Ajukan akses admin untuk mengelola data pendaftaran</p>
+  </div>
+
+  <!-- Card -->
+  <div class="reg-card">
+    
+    <!-- Info Box -->
+    <div class="info-box">
+      <i class="fas fa-info-circle"></i>
+      <div>
+        <strong>Informasi Penting:</strong><br>
+        Setelah mendaftar, permintaan Anda akan ditinjau oleh Super Admin.<br>
+        Proses persetujuan maksimal 1x24 jam. Anda akan diberitahu via WhatsApp.
+      </div>
+    </div>
+
+    <!-- Alert -->
+    <div id="alertBox" class="alert alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      <span id="alertMsg">Error message</span>
+    </div>
+
+    <!-- Form -->
+    <form id="registerForm" onsubmit="return false;">
+      
+      <!-- NPSN -->
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-school"></i> NPSN <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input type="text" class="form-input" id="regNpsn" 
+                 placeholder="Masukkan NPSN 8 digit" 
+                 maxlength="8" inputmode="numeric" required autocomplete="off">
+          <span class="input-icon"><i class="fas fa-hashtag"></i></span>
+        </div>
+        <span class="form-hint"><i class="fas fa-search"></i> Sistem akan memverifikasi NPSN secara otomatis</span>
+      </div>
+
+      <!-- Nama Sekolah -->
+       <div class="form-group">
+        <label class="form-label"><i class="fas fa-school"></i> Nama Sekolah <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input type="text"
+              class="form-input"
+              id="regNamaSekolah"
+              placeholder="Contoh : Paud/sps/kober Ceria Purwaharja"
+              required
+              autocomplete="organization">
+          <span class="input-icon"><i class="fas fa-school"></i>
+          </span>
+      </div>
+
+      <!-- Nama Lengkap -->
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-user"></i> Nama Lengkap <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input type="text" class="form-input" id="regFullName" 
+                 placeholder="Nama lengkap sesuai KTP" required autocomplete="name">
+          <span class="input-icon"><i class="fas fa-user-edit"></i></span>
+        </div>
+      </div>
+
+            <!-- Username -->
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-user-school"></i>User Name <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input type="text" class="form-input" id="regUsername" 
+                 placeholder="Contoh : satria27 (minimal 6 karakter)" required 
+                 autocomplete="username" minlength="6" maxlength="50"
+                 pattern="[a-zA-Z0-9_]+" title="Huruf, angka, underscore saja">
+          <span class="input-icon"><i class="fas fa-user-edit"></i></span>
+        </div>
+        <span class="form-hint"><i class="fas fa-lock"></i> akan disetujui</span>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-envelope"></i> Email Aktif <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input type="email" class="form-input" id="regEmail" 
+                 placeholder="email@sekolah.id (untuk notifikasi)" required autocomplete="email">
+          <span class="input-icon"><i class="fas fa-envelope"></i></span>
+        </div>
+        <span class="form-hint"><i class="fas fa-bell"></i> Email digunakan untuk memberitahu hasil persetujuan</span>
+      </div>
+
+      <!-- No HP -->
+      <div class="form-group">
+        <label class="form-label"><i class="fas fa-phone"></i> No. HP Aktif <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <input type="tel" class="form-input" id="regPhone" 
+                 placeholder="08xxxxxxxxxx" required autocomplete="tel" inputmode="tel">
+          <span class="input-icon"><i class="fas fa-mobile-alt"></i></span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-submit" id="btnSubmit" onclick="handleRegister(event)">
+        <i class="fas fa-paper-plane"></i>
+        <span id="btnText">Kirim Permintaan</span>
+      </button>
+    </form>
+
+    <!-- Success Section (Hidden by default) -->
+    <div class="success-section" id="successSection">
+      <div class="success-icon-big">📋</div>
+      <h2 class="success-title">Permintaan Diterima!</h2>
+      <p class="success-subtitle">Data Anda telah tersimpan dan menunggu persetujuan.</p>
+      
+      <div class="request-number-box">
+        <span class="request-number-label">Nomor Pengajuan:</span>
+        <span class="request-number-value" id="displayRequestNumber">-</span>
+      </div>
+
+      <div class="next-steps">
+        <div class="step-item">
+          <span class="step-number">1</span>
+          <span>Super Admin memverifikasi data Anda</span>
+        </div>
+        <div class="step-item">
+          <span class="step-number">2</span>
+          <span>Jika disetujui, akun dibuat & notifikasi via WhatsApp</span>
+        </div>
+        <div class="step-item">
+          <span class="step-number">3</span>
+          <span>Login dengan kredensial yang diberikan</span>
+        </div>
+      </div>
+
+      <a href="index.html" class="back-link">
+        <i class="fas fa-arrow-left"></i> Kembali ke Beranda PPDB
+      </a>
+    </div>
+
+  </div><!-- end card -->
+
+</div><!-- end container -->
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Logic Script -->
+<script type="module">
+  import { supabaseClient } from './src/config/supabase.js';
+  window._supabase = supabaseClient;
+
+  // ==========================================
+  // STATE
+  // ==========================================
+  const AppState = {
+    npsnCache: null  // Cache nama sekolah setelah lookup
+  };
+
+  // ==========================================
+  // INIT
+  // ==========================================
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[REGISTRASI] Page loaded');
+    
+    // NPSN auto-lookup on blur
+    const npsnInput = document.getElementById('regNpsn');
+    if (npsnInput) {
+      npsnInput.addEventListener('blur', handleNpsnLookup);
+    }
+  });
+
+// ==========================================
+// NPSN LOOKUP
+// ==========================================
+async function handleNpsnLookup() {
+
+  const npsn = document.getElementById('regNpsn').value.trim();
+
+  if (!npsn || npsn.length < 8) return;
+
+  try {
+
+    console.log('[REG] Checking NPSN:', npsn);
+
+    // Cek apakah sudah ada request pending
+    const { data: pendingReq, error: pendingErr } = await supabaseClient
+      .from('admin_requests')
+      .select('id')
+      .eq('npsn', npsn)
+      .eq('status', 'pending')
+      .maybeSingle();
+
+    if (pendingErr) {
+      throw pendingErr;
+    }
+
+    // Jika sudah ada pending
+    if (pendingReq) {
+
+      showAlert(
+        'NPSN ini sudah memiliki pengajuan pending.',
+        'warning'
+      );
+
+      return;
+    }
+
+    // Cache sederhana
+    AppState.npsnCache = npsn;
+
+    showToast(
+      'NPSN siap digunakan untuk pengajuan',
+      'success'
+    );
+
+  } catch(err) {
+
+    console.error('[REG] Lookup error:', err);
+
+    showAlert(
+      'Gagal memeriksa data pengajuan.',
+      'error'
+    );
+  }
+}
+
+
+// ==========================================
+// MAIN REGISTER HANDLER
+// ==========================================
+window.handleRegister = async function(e) {
+
+  e.preventDefault();
+
+  console.log('[REG] Submit clicked');
+
+  // ==========================================
+  // INPUT
+  // ==========================================
+  const npsn = document.getElementById('regNpsn').value.trim();
+
+  const fullName = document.getElementById('regFullName').value.trim();
+
+  const email = document.getElementById('regEmail')
+    .value
+    .trim()
+    .toLowerCase();
+
+  const phone = document.getElementById('regPhone').value.trim();
+  const username = document.getElementById('regUsername').value.trim();
+  const namaSekolah = document.getElementById('regNamaSekolah').value;
+
+  // ==========================================
+  // VALIDASI
+  // ==========================================
+  if (
+    !npsn ||
+    !fullName ||
+    !email ||
+    !phone ||
+    !username ||
+    !namaSekolah
+  ) {
+
+    showAlert(
+      'Mohon lengkapi semua field wajib!',
+      'error'
+    );
+
+    return;
+  }
+
+  // NPSN
+  if (npsn.length !== 8) {
+
+    showAlert(
+      'NPSN harus 8 digit!',
+      'error'
+    );
+
+    return;
+  }
+
+  // Email
+  if (!isValidEmail(email)) {
+
+    showAlert(
+      'Format email tidak valid!',
+      'error'
+    );
+
+    return;
+  }
+
+  // Username
+  if (username.length < 4) {
+
+    showAlert(
+      'Username minimal 4 karakter!',
+      'error'
+    );
+
+    return;
+  }
+
+  // Username format
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+
+    showAlert(
+      'Username hanya boleh huruf, angka, dan underscore!',
+      'error'
+    );
+
+    return;
+  }
+
+  // Pastikan lookup selesai
+  if (!AppState.npsnCache) {
+
+    showAlert(
+      'Silakan tunggu validasi NPSN selesai!',
+      'warning'
+    );
+
+    return;
+  }
+  // ==========================================
+  // LOADING
+  // ==========================================
+  setLoading(true);
+
+
+  try {
+
+    // ==========================================
+    // CEK DUPLICATE REQUEST
+    // ==========================================
+    const { data: dupReq, error: dupErr } = await supabaseClient
+      .from('admin_requests')
+      .select('id')
+      .eq('npsn', npsn)
+      .eq('status', 'pending')
+      .maybeSingle();
+
+    if (dupErr) {
+      throw dupErr;
+    }
+
+    if (dupReq) {
+
+      throw new Error(
+        'NPSN ini sudah memiliki pengajuan pending.'
+      );
+    }
+
+
+    // ==========================================
+    // INSERT REQUEST
+    // ==========================================
+    const { data: requestData, error: insertError } =
+      await supabaseClient
+        .from('admin_requests')
+        .insert({
+          npsn: npsn,
+          nama_lengkap: fullName,
+          email: email,
+          no_hp: phone,
+          username_desired: username,
+          nama_sekolah: namaSekolah,
+          status: 'pending'
+        })
+        .select('id, created_at')
+        .single();
+
+
+    // Handle error
+    if (insertError) {
+
+      console.error('[REG] Insert error:', insertError);
+
+      throw insertError;
+    }
+
+
+    // ==========================================
+    // SUCCESS
+    // ==========================================
+    console.log('[REG] SUCCESS:', requestData);
+
+
+    // Generate nomor tampilan
+    const displayId = requestData.id
+      .toString()
+      .slice(0, 8)
+      .toUpperCase();
+
+
+    // Hide form
+    document.getElementById('registerForm')
+      .style.display = 'none';
+
+
+    // Show success
+    document.getElementById('successSection')
+      .classList.add('show');
+
+
+    // Nomor pengajuan
+    document.getElementById('displayRequestNumber')
+      .textContent = displayId;
+
+
+    // Scroll
+    document.getElementById('successSection')
+      .scrollIntoView({
+        behavior: 'smooth'
+      });
+
+
+    // Toast
+    showToast(
+      'Permintaan berhasil dikirim!',
+      'success'
+    );
+    // Redirect otomatis ke halaman utama
+setTimeout(() => {
+  window.location.href = 'index.html';
+}, 5000);
+
+  } catch(err) {
+
+    console.error('[REG] ERROR:', err);
+
+    showAlert(
+      err.message || 'Gagal mengirim permintaan.',
+      'error'
+    );
+
+    setLoading(false);
+  }
+};
+
+  // ==========================================
+  // UI HELPERS
+  // ==========================================
+function showAlert(msg, type = 'error') {
+
+  const box = document.getElementById('alertBox');
+  const msgEl = document.getElementById('alertMsg');
+
+  if (!box || !msgEl) return;
+
+  // tampilkan
+  box.className = `alert show alert-${type}`;
+
+  // isi pesan
+  msgEl.innerHTML = msg;
+
+  // icon
+  const icon = box.querySelector('i');
+
+  if (icon) {
+    icon.className =
+      type === 'success'
+        ? 'fas fa-check-circle'
+        : type === 'warning'
+        ? 'fas fa-exclamation-triangle'
+        : 'fas fa-exclamation-circle';
+  }
+
+  // reset timer lama
+  clearTimeout(window.alertTimeout);
+
+  // auto hide 2 detik
+  window.alertTimeout = setTimeout(() => {
+
+    box.classList.remove('show');
+
+  }, 7000);
+}
+
+  function hideAlert() {
+    document.getElementById('alertBox')?.classList.remove('show');
+  }
+
+  function setLoading(load) {
+    const btn = document.getElementById('btnSubmit');
+    const textEl = document.getElementById('btnText');
+    if (!btn || !textEl) return;
+    btn.disabled = load;
+    textEl.innerHTML = load 
+      ? '<span class="spinner-small"></span> Mengirim...'
+      : '<i class="fas fa-paper-plane"></i> Kirim Permintaan';
+  }
+
+  function scrollToFirstError() {
+    const firstInvalid = document.querySelector(':invalid');
+    if (firstInvalid) {
+      firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstInvalid.focus();
+    }
+  }
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function showToast(msg, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    const icons = { success: '✅', error: '❌', warning: '⚠️' };
+    toast.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span style="flex:1;font-size:0.92rem">${msg}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(100%)';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+</script>
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('regPassword');
+    const eyeIcon = document.getElementById('toggleEye');
+
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.remove('fa-eye');
+        eyeIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.remove('fa-eye-slash');
+        eyeIcon.classList.add('fa-eye');
+    }
+}
+</script>
+</body>
+</html>

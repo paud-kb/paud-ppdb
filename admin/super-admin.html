@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="id" class="dash-auth-pending">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0f1a">
+    <title>Super Admin Panel - Manajemen Operator</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Auth Guard Styles -->
+    <style>
+        html.dash-auth-pending body { opacity: 0 !important; }
+        html.dash-auth-ready body { opacity: 1 !important; transition: opacity 0.15s ease-out; }
+        
+        .sa-loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #0a0f1a 0%, #1a1a2e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+        }
+        
+        .sa-loader-box {
+            text-align: center;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 40px;
+        }
+        
+        .sa-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,255,255,0.15);
+            border-top-color: #8b5cf6;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ==========================================
+           CSS VARIABLES
+           ========================================== */
+        :root {
+            --bg-primary: #0a0f1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a2332;
+            --bg-hover: #243044;
+            --border-color: #2d3a4f;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ==========================================
+           SIDEBAR
+           ========================================== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            z-index: 100;
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.open { transform: translateX(0); }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); box-shadow: 20px 0 60px rgba(0,0,0,0.5); }
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, transparent 100%);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(139,92,246,0.3);
+        }
+
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .logo-badge {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .nav-section {
+            padding: 16px 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            padding: 12px 12px 8px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            font-weight: 600;
+        }
+
+        .nav-item i { width: 20px; height: 20px; }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-mini-profile:hover {
+            background: var(--bg-hover);
+        }
+
+        .user-mini-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .user-mini-info { flex: 1; min-width: 0; }
+        .user-mini-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-mini-role { font-size: 11px; color: var(--accent); }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 150;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) { .mobile-toggle { display: flex; } }
+
+        /* ==========================================
+           MAIN CONTENT
+           ========================================== */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            padding: 28px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; padding: 80px 16px 28px; }
+        }
+
+        /* Top Header */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 18px 22px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            animation: fadeInDown 0.4s ease;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .top-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .top-header-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-header-badge {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .header-user-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .header-user-btn:hover { border-color: var(--accent); }
+
+        .header-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--info));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .header-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            min-width: 200px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            display: none;
+            z-index: 200;
+            overflow: hidden;
+        }
+
+        .header-dropdown.show { display: block; animation: dropFade 0.2s ease; }
+
+        @keyframes dropFade {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+
+        .dropdown-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .dropdown-item.danger { color: var(--danger); }
+        .dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
+        .dropdown-divider { height: 1px; background: var(--border-color); margin: 4px 0; }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-subtitle { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: none;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139,92,246,0.3);
+        }
+
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(139,92,246,0.45); }
+
+        .btn-secondary { background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-secondary:hover { background: var(--bg-hover); }
+
+        .btn-success { background: linear-gradient(135deg, var(--success), #059669); color: white; }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(16,185,129,0.4); }
+
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #dc2626); color: white; }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(239,68,68,0.4); }
+
+        .btn-sm { padding: 8px 14px; font-size: 13px; }
+
+        .btn i, .btn svg { width: 16px; height: 16px; font-size: 14px; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 26px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; right: 0; height: 3px;
+        }
+
+        .stat-card:nth-child(1)::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--success), #34d399); }
+        .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--danger), #f87171); }
+        .stat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--info), #60a5fa); }
+
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+        .stat-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .stat-icon.pending { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .stat-icon.approved { background: rgba(16,185,129,0.15); color: var(--success); }
+        .stat-icon.rejected { background: rgba(239,68,68,0.15); color: var(--danger); }
+        .stat-icon.total { background: rgba(59,130,246,0.15); color: var(--info); }
+
+        /* Table Container */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            overflow: hidden;
+            animation: fadeInUp 0.5s ease 0.2s backwards;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .toolbar-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 16px;
+            min-width: 260px;
+            transition: all 0.2s;
+        }
+
+        .search-box:focus-within { border-color: var(--accent); }
+
+        .search-box i { color: var(--text-muted); }
+        .search-box input { background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 14px; width: 100%; margin-left: 10px; font-family: inherit; }
+        .search-box input::placeholder { color: var(--text-muted); }
+
+        /* Data Table */
+        .data-table { width: 100%; border-collapse: collapse; }
+
+        .data-table th {
+            text-align: left;
+            padding: 13px 18px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 15px 18px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .data-table tbody tr { transition: all 0.2s; }
+        .data-table tbody tr:hover { background: var(--bg-hover); }
+        .data-table tbody tr:last-child td { border-bottom: none; }
+
+        /* Username Cell */
+        .username-cell code {
+            background: linear-gradient(135deg, #F3E5F5, #EDE7F6);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #7B1FA2;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* NPSN Cell */
+        .npsn-cell {
+            font-family: 'Courier New', monospace;
+            background: rgba(16,185,129,0.08);
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: var(--success);
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-pending {
+            background: rgba(245,158,11,0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245,158,11,0.25);
+        }
+
+        .badge-approved {
+            background: rgba(16,185,129,0.15);
+            color: var(--success);
+            border: 1px solid rgba(16,185,129,0.25);
+        }
+
+        .badge-rejected {
+            background: rgba(239,68,68,0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+
+        /* Action Buttons */
+        .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+        .action-btn:hover { background: var(--bg-hover); transform: scale(1.05); }
+
+        .action-btn.approve:hover { border-color: var(--success); color: var(--success); background: rgba(16,185,129,0.1); }
+        .action-btn.reject:hover { border-color: var(--danger); color: var(--danger); background: rgba(239,68,68,0.1); }
+        .action-btn.view:hover { border-color: var(--info); color: var(--info); background: rgba(59,130,246,0.1); }
+        .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i { font-size: 3.5rem; margin-bottom: 16px; opacity: 0.35; }
+        .empty-state h3 { font-family: 'Space Grotesk'; margin-bottom: 8px; color: var(--text-secondary); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 70px rgba(0,0,0,0.5);
+        }
+
+        .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 26px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 17px;
+        }
+
+        .modal-close:hover { background: var(--danger); border-color: var(--danger); color: white; }
+
+        .modal-body { padding: 26px; }
+
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .detail-item { margin-bottom: 10px; }
+
+        .detail-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value { font-size: 14px; color: var(--text-primary); font-weight: 500; word-break: break-word; }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 18px 26px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        /* Reject Modal Special */
+        .reject-reason-area {
+            margin-top: 16px;
+        }
+
+        .reject-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .reject-textarea:focus { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            animation: slideInRight 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+        }
+
+        .toast.success::before { background: var(--success); }
+        .toast.error::before { background: var(--danger); }
+        .toast.warning::before { background: var(--warning); }
+        .toast.info::before { background: var(--info); }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .toast-icon { font-size: 18px; flex-shrink: 0; }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.warning .toast-icon { color: var(--warning); }
+        .toast-message { flex: 1; font-size: 14px; line-height: 1.4; }
+        .toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 15px; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+                /* Action Button Text (Approve/Reject besar) */
+        .action-btn-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-color);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .action-btn-text.approve {
+            color: var(--success);
+            border-color: rgba(16,185,129,0.35);
+        }
+        .action-btn-text.approve:hover {
+            background: rgba(16,185,129,0.12);
+            border-color: var(--success);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(16,185,129,0.2);
+        }
+
+        .action-btn-text.reject {
+            color: var(--danger);
+            border-color: rgba(239,68,68,0.35);
+        }
+        .action-btn-text.reject:hover {
+            background: rgba(239,68,68,0.12);
+            border-color: var(--danger);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(239,68,68,0.2);
+        }
+
+        .action-btn-text:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* School info cell */
+        .school-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .school-cell .school-name {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .school-cell .school-npsn {
+            font-family: 'Courier New', monospace;
+            background: rgba(16,185,129,0.08);
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: var(--success);
+            font-weight: 600;
+            font-size: 11px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        /* Approve modal password area */
+        .password-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .password-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+        .password-input-wrap input {
+            width: 100%;
+            padding: 12px 44px 12px 16px;
+            background: var(--bg-secondary);
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .password-input-wrap input:focus {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            font-size: 14px;
+        }
+        .password-toggle-btn:hover { color: var(--text-primary); }
+
+        .password-strength {
+            font-size: 12px;
+            min-height: 18px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        .strength-weak { color: var(--danger); }
+        .strength-medium { color: var(--warning); }
+        .strength-strong { color: var(--success); }
+
+        /* Result modal password display */
+        .result-password-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .result-password-box code {
+            flex: 1;
+            background: rgba(245,158,11,0.1);
+            border: 1px solid rgba(245,158,11,0.2);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--warning);
+            letter-spacing: 1.5px;
+            user-select: all;
+            font-family: 'Courier New', monospace;
+        }
+
+    </style>
+
+    <!-- Auth Check Script -->
+    <script type="module">
+        import { supabaseClient } from '../src/config/supabase.js';
+        
+        try {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            
+            if (!session || error) {
+                window.location.replace('login.html');
+            } else {
+                const { data: me } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('email', session.user.email)
+                    .maybeSingle();
+                
+                if (!me || me.role !== 'super_admin') {
+                    alert('Akses ditolak! Hanya Super Admin.');
+                    window.location.replace('dashboard.html');
+                } else {
+                    window.__SA_USER = me;
+                    document.documentElement.classList.remove('dash-auth-pending');
+                    document.documentElement.classList.add('dash-auth-ready');
+                    
+                    // Update UI
+                    setTimeout(() => updateUserInfoDisplay(me), 100);
+                }
+            }
+        } catch (err) {
+            console.error('[Auth] Error:', err.message);
+            window.location.replace('login.html');
+        }
+
+        function updateUserInfoDisplay(user) {
+            if (!user) return;
+            const initials = (user.full_name || 'SA').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const name = user.full_name || 'Super Admin';
+            
+            document.getElementById('sidebarUserName').textContent = name;
+            document.getElementById('sidebarAvatar').textContent = initials;
+            document.getElementById('headerUserName').textContent = name.split(' ')[0];
+            document.getElementById('headerAvatar').textContent = initials;
+            document.getElementById('dropdownName').textContent = name;
+            document.getElementById('dropdownEmail').textContent = user.email || 'admin@ppdb.id';
+        }
+    </script>
+</head>
+<body class="dash-auth-pending">
+
+    <!-- Loader -->
+    <div class="sa-loader-overlay" id="saLoader">
+        <div class="sa-loader-box">
+            <div class="sa-spinner"></div>
+            <div style="font-size:1.1rem;font-weight:600;">Memuat Panel Super Admin...</div>
+            <div style="font-size:0.85rem;opacity:0.85;">Mohon tunggu sebentar</div>
+        </div>
+    </div>
+
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+                <div>
+                    <div class="logo-text">AdminPanel</div>
+                    <span class="logo-badge">Super Admin</span>
+                </div>
+            </a>
+        </div>
+        
+        <nav class="nav-section">
+            <div class="nav-label">Menu Utama</div>
+            
+            <a class="nav-item active" href="super-admin.html">
+                <i class="fas fa-user-cog"></i>
+                <span>User Management</span>
+            </a>
+            
+            <div class="nav-label">System</div>
+            
+            <a class="nav-item" href="#">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-mini-profile" onclick="toggleUserMenu()">
+                <div class="user-mini-avatar" id="sidebarAvatar">SA</div>
+                <div class="user-mini-info">
+                    <div class="user-mini-name" id="sidebarUserName">Loading...</div>
+                    <div class="user-mini-role"><i class="fas fa-crown"></i> Super Admin</div>
+                </div>
+                <i class="fas fa-chevron-right" style="font-size:12px;color:var(--text-muted);"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Header -->
+        <header class="top-header">
+            <div class="top-header-left">
+                <h1 class="top-header-title">
+                    <i class="fas fa-user-shield" style="color:var(--accent);"></i>
+                    User Management
+                </h1>
+                <span class="top-header-badge"><i class="fas fa-shield-alt"></i> Super Admin</span>
+            </div>
+            <div class="top-header-right">
+                <div class="header-user-btn" id="headerUserBtn" onclick="toggleUserMenu()">
+                    <div class="header-user-avatar" id="headerAvatar">SA</div>
+                    <span id="headerUserName">Super Admin</span>
+                    <i class="fas fa-chevron-down" style="font-size:12px;"></i>
+                    
+                    <div class="header-dropdown" id="headerDropdown">
+                        <div style="padding:12px 16px;border-bottom:1px solid var(--border-color);">
+                            <div style="font-weight:600;font-size:14px;" id="dropdownName">Super Admin</div>
+                            <div style="font-size:12px;color:var(--text-muted);" id="dropdownEmail">admin@ppdb.id</div>
+                        </div>
+                        <button class="dropdown-item" onclick="window.location.href='dashboard.html'">
+                            <i class="fas fa-chart-line"></i> Ke Dashboard
+                        </button>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item danger" onclick="doLogout()">
+                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <section class="page-header">
+            <div>
+                <h2 class="page-title">
+                    <i class="fas fa-users-gear"></i>
+                    Permintaan Operator
+                </h2>
+                <p class="page-subtitle">Kelola pengajuan akun operator/admin sekolah</p>
+            </div>
+        </section>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid">
+            <article class="stat-card">
+                <div class="stat-icon total"><i class="fas fa-inbox"></i></div>
+                <div class="stat-value" id="totalRequests">0</div>
+                <div class="stat-label">Total Permintaan</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
+                <div class="stat-value" id="pendingRequests">0</div>
+                <div class="stat-label">Menunggu Review</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-icon approved"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-value" id="approvedRequests">0</div>
+                <div class="stat-label">Disetujui</div>
+            </article>
+            <article class="stat-card">
+                <div class="stat-icon rejected"><i class="fas fa-times-circle"></i></div>
+                <div class="stat-value" id="rejectedRequests">0</div>
+                <div class="stat-label">Ditolak</div>
+            </article>
+        </section>
+
+        <!-- Table Section -->
+        <section class="table-container">
+            <div class="table-toolbar">
+                <div class="toolbar-title">
+                    <i class="fas fa-list" style="color:var(--accent);"></i>
+                    Daftar Pengajuan Akun
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="saSearch" placeholder="Cari nama, email, NPSN..." oninput="filterRequests()">
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <i class="fas fa-inbox"></i>
+                <h3>Tidak Ada Permintaan</h3>
+                <p>Belum ada pengajuan akun operator baru.</p>
+            </div>
+
+            <!-- Data Table -->
+            <table class="data-table" id="requestTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Tanggal</th>
+                        <th>Nama Lengkap</th>
+                        <th>Email</th>
+                        <th>Sekolah</th>
+                        <th>Username Diinginkan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="requestTableBody"></tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Detail Modal -->
+    <div class="modal-overlay" id="detailModal" onclick="if(event.target === this) closeDetailModal()">
+        <div class="modal" role="dialog">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-eye" style="color:var(--info);"></i> Detail Pengajuan</h3>
+                <button class="modal-close" onclick="closeDetailModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="detailModalBody"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDetailModal()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" id="rejectModal" onclick="if(event.target === this) closeRejectModal()">
+        <div class="modal" style="max-width:450px;" role="dialog">
+            <div class="modal-header" style="justify-content:center;">
+                <h3 class="modal-title" style="color:var(--danger);">
+                    <i class="fas fa-times-circle"></i> Tolak Pengajuan
+                </h3>
+            </div>
+            <div class="modal-body" style="text-align:center;padding:30px 26px;">
+                <div style="width:64px;height:64px;border-radius:50%;background:rgba(239,68,68,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:28px;color:var(--danger);">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+                <p style="margin-bottom:8px;">Anda akan menolak pengajuan dari:</p>
+                <strong id="rejectTargetName" style="font-size:16px;color:var(--primary);">-</strong>
+                <p style="font-size:13px;color:var(--text-muted);margin-top:4px;" id="rejectTargetEmail">-</p>
+                
+                <div class="reject-reason-area">
+                    <label style="display:block;text-align:left;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Alasan Penolakan <span style="color:var(--danger);">*</span></label>
+                    <textarea id="rejectReason" class="reject-textarea" placeholder="Tulis alasan mengapa pengajuan ini ditolak..." required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button type="button" class="btn btn-secondary" onclick="closeRejectModal()"><i class="fas fa-arrow-left"></i> Batal</button>
+                <button type="button" class="btn btn-danger" id="confirmRejectBtn" onclick="executeReject()"><i class="fas fa-ban"></i> Ya, Tolak!</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- Approve Modal (Password Input) -->
+    <div class="modal-overlay" id="approveModal" onclick="if(event.target === this) closeApproveModal()">
+        <div class="modal" style="max-width:500px;" role="dialog">
+            <div class="modal-header" style="justify-content:center;">
+                <h3 class="modal-title" style="color:var(--success);">
+                    <i class="fas fa-check-circle"></i> Setujui Pengajuan
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(16,185,129,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:28px;color:var(--success);">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <p style="color:var(--text-secondary);margin-bottom:6px;">Anda akan menyetujui pengajuan dari:</p>
+                    <strong id="approveTargetName" style="font-size:16px;">-</strong>
+                    <p style="font-size:13px;color:var(--text-muted);margin-top:4px;" id="approveTargetInfo">-</p>
+                </div>
+
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">
+                        Password Awal untuk Operator <span style="color:var(--danger);">*</span>
+                    </label>
+                    <div class="password-input-group">
+                        <div class="password-input-wrap">
+                            <input type="password" id="approvePassword" placeholder="Min. 6 karakter" required minlength="6">
+                            <button type="button" class="password-toggle-btn" onclick="toggleApprovePassword()">
+                                <i class="fas fa-eye" id="approveToggleEye"></i>
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-secondary" onclick="generatePassword()" style="white-space:nowrap;padding:12px 16px;">
+                            <i class="fas fa-dice"></i> Generate
+                        </button>
+                    </div>
+                    <div class="password-strength" id="approvePasswordStrength"></div>
+                    <p style="font-size:12px;color:var(--text-muted);line-height:1.5;">
+                        <i class="fas fa-info-circle" style="color:var(--info);"></i>
+                        Password akan langsung di-hash. <strong style="color:var(--warning);">Simpan password ini untuk dikirim ke operator via WhatsApp.</strong>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button type="button" class="btn btn-secondary" onclick="closeApproveModal()">
+                    <i class="fas fa-arrow-left"></i> Batal
+                </button>
+                <button type="button" class="btn btn-success" id="confirmApproveBtn" onclick="executeApprove()">
+                    <i class="fas fa-check-circle"></i> Ya, Setujui!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Result Modal (One-Time Display) -->
+    <div class="modal-overlay" id="resultModal" onclick="if(event.target === this) closeResultModal()">
+        <div class="modal" style="max-width:460px;" role="dialog">
+            <div class="modal-header" style="justify-content:center;border-bottom:none;">
+                <div style="text-align:center;">
+                    <div style="width:72px;height:72px;border-radius:50%;background:rgba(16,185,129,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:32px;color:var(--success);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 style="font-size:18px;font-weight:700;color:var(--success);">Pengajuan Disetujui!</h3>
+                </div>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <p style="color:var(--text-secondary);margin-bottom:20px;line-height:1.5;">
+                    Akun operator berhasil dibuat.<br><strong>Kirimkan data login berikut ke operator via WhatsApp:</strong>
+                </p>
+                <div style="background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;padding:20px;text-align:left;">
+                    <div style="margin-bottom:14px;">
+                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Nama Lengkap</div>
+                        <div style="font-weight:600;" id="resultName">-</div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Username</div>
+                        <div style="font-weight:600;font-family:'Courier New',monospace;color:var(--accent);" id="resultUsername">-</div>
+                    </div>
+                    <div>
+                        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Password Awal</div>
+                        <div class="result-password-box">
+                            <code id="resultPassword">-</code>
+                            <button onclick="copyPassword()" class="btn btn-secondary" style="padding:12px 14px;" title="Salin Password">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        <p style="font-size:11px;color:var(--danger);margin-top:8px;font-weight:500;">
+                            <i class="fas fa-exclamation-triangle"></i> Password TIDAK ditampilkan lagi setelah modal ditutup!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content:center;">
+                <button type="button" class="btn btn-success" onclick="closeResultModal()" style="padding:12px 28px;">
+                    <i class="fas fa-check"></i> Saya Sudah Menyimpan Password
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastBox" class="toast-container"></div>
+
+    <!-- Module Script -->
+    <!-- ✅ YANG BENAR -->
+    <script type="module" src="../src/js/admin/super-admin.js"></script>
+
+    <!-- Helper Scripts (Non-Module) -->
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar')?.classList.toggle('open');
+        }
+        window.toggleSidebar = toggleSidebar;
+
+        function toggleUserMenu() {
+            document.getElementById('headerDropdown')?.classList.toggle('show');
+        }
+
+        document.addEventListener('click', e => {
+            const dd = document.getElementById('headerDropdown');
+            const btn = document.getElementById('headerUserBtn');
+            if (dd && !dd.contains(e.target) && btn && !btn.contains(e.target)) {
+                dd.classList.remove('show');
+            }
+        });
+
+        async function doLogout() {
+            if (!confirm('Yakin ingin keluar?')) return;
+            try { await (await import('../src/config/supabase.js')).supabaseClient.auth.signOut(); } catch(e) {}
+            localStorage.clear(); sessionStorage.clear();
+            window.location.replace('login.html');
+        }
+        window.doLogout = doLogout;
+
+        // Hide loader when ready
+        new MutationObserver(() => {
+            const l = document.getElementById('saLoader');
+            if (l && document.documentElement.classList.contains('dash-auth-ready')) {
+                setTimeout(() => { l.style.opacity = '0'; setTimeout(() => l?.remove(), 300); }, 150);
+            }
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    </script>
+
+</body>
+</html>

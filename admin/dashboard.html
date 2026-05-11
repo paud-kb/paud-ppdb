@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="id" class="dash-auth-pending">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0f1a">
+  <title>Dashboard Admin - PPDB PAUD Banjar</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ==========================================
+       AUTH GUARD
+       ========================================== */
+    html.dash-auth-pending body { opacity: 0 !important; }
+    html.dash-auth-ready body { opacity: 1 !important; transition: opacity 0.15s ease-out; }
+    
+    .dash-loader-overlay {
+      position: fixed; inset: 0;
+      background: linear-gradient(135deg, #0a0f1a 0%, #1a1a2e 100%);
+      display: flex; align-items: center; justify-content: center; z-index: 99999;
+    }
+    .dash-loader-box { text-align: center; color: white; font-family: 'Space Grotesk', sans-serif; padding: 40px; }
+    .dash-spinner {
+      width: 44px; height: 44px;
+      border: 4px solid rgba(255,255,255,0.15); border-top-color: #63D2BC;
+      border-radius: 50%; animation: dashSpin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes dashSpin { to { transform: rotate(360deg); } }
+
+    /* ==========================================
+       CSS VARIABLES (DARK BLUE THEME)
+       ========================================== */
+    :root {
+      --bg-primary: #0a0f1a;
+      --bg-secondary: #111827;
+      --bg-card: #1a2332;
+      --bg-hover: #243044;
+      --bg-input: #0f172a;
+      --border-color: #2d3a4f;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #63D2BC;
+      --accent-hover: #4db8a3;
+      --accent-glow: rgba(99,210,188,0.2);
+      --secondary: #74C0FC;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --success: #81C784;
+      --pink: #FF6B9D;
+      --purple: #C9B1FF;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { 
+      background: var(--bg-primary); 
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      color: var(--text-primary);
+    }
+
+    /* ===== HEADER ===== */
+    .dash-header { 
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 14px 20px; 
+      position: sticky; top: 0; z-index: 100;
+    }
+
+    .dash-header-content { 
+      max-width: 1400px; margin: 0 auto; 
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+
+    .dash-brand { 
+      display: flex; align-items: center; gap: 12px; 
+      text-decoration: none; color: inherit;
+    }
+
+    .dash-logo-icon { 
+      width: 44px; height: 44px; 
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      border-radius: 12px; 
+      display: flex; align-items: center; justify-content: center; 
+      font-size: 1.3rem;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .dash-title-group { line-height: 1.2; }
+    .dash-title-main { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 700; }
+    .dash-title-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+    .dash-user-menu { display: flex; align-items: center; gap: 12px; position: relative; }
+    .dash-user-info { text-align: right; line-height: 1.3; }
+    .dash-user-name { font-size: 0.88rem; font-weight: 600; }
+    .dash-user-role { font-size: 0.72rem; color: var(--accent); }
+
+    .dash-avatar { 
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--secondary));
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; 
+      font-size: 1.1rem; transition: transform 0.2s; 
+      border: none; color: white;
+    }
+    .dash-avatar:hover { transform: scale(1.08); }
+
+    /* User Dropdown */
+    #userDropdown { 
+      display: none; position: absolute; top: 58px; right: 0;
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; 
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      min-width: 230px; z-index: 101; overflow: hidden;
+      flex-direction: column; gap: 4px; padding: 8px;
+    }
+    #userDropdown.show { display: flex; animation: dropFade 0.2s ease; }
+    @keyframes dropFade { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    #userDropdown a, #userDropdown button { 
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; font-size: 0.9rem; font-weight: 500; 
+      text-decoration: none; transition: all 0.2s; border-radius: 10px;
+      border: none; cursor: pointer; width: 100%; text-align: left; font-family: inherit;
+      color: var(--text-secondary); background: transparent;
+    }
+    #userDropdown a:hover, #userDropdown button:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+    .logout-btn-dropdown {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 12px 18px;
+      background: rgba(239,68,68,0.08); border: none; border-radius: 10px;
+      color: var(--danger); font-size: 0.9rem; font-weight: 600;
+      cursor: pointer; transition: all 0.25s ease; font-family: 'Inter', sans-serif;
+    }
+    .logout-btn-dropdown:hover { background: rgba(239,68,68,0.15); transform: translateX(-4px); }
+
+    .sa-link-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px;
+      background: rgba(139,92,246,0.08);
+      color: #a78bfa !important; font-weight: 700 !important;
+      border-top: 1px solid var(--border-color); margin-top: 4px;
+      transition: all 0.2s ease; text-decoration: none;
+    }
+    .sa-link-item:hover { background: rgba(139,92,246,0.15) !important; transform: translateX(-4px); }
+
+    /* ===== CONTAINER ===== */
+    .dash-container { max-width: 1400px; margin: 0 auto; padding: 24px 20px 100px; }
+
+    /* ===== WELCOME BANNER ===== */
+    .welcome-banner { 
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent);
+      border-radius: 16px; padding: 24px 28px; margin-bottom: 28px;
+      display: flex; justify-content: space-between; align-items: center; gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .welcome-left h2 { 
+      font-family: 'Space Grotesk', sans-serif; color: var(--text-primary); 
+      font-size: 1.35rem; margin-bottom: 6px; 
+    }
+    .welcome-left p { color: var(--text-secondary); font-size: 0.92rem; margin: 0; }
+
+    .welcome-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+
+    .school-badge { 
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(99,210,188,0.1); border: 1px solid rgba(99,210,188,0.2);
+      padding: 10px 18px; border-radius: 14px;
+      font-weight: 600; color: var(--accent); font-size: 0.92rem;
+    }
+
+    .npsn-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(116,192,252,0.1); border: 1px solid rgba(116,192,252,0.2);
+      padding: 6px 14px; border-radius: 20px;
+      font-size: 0.78rem; font-weight: 600; color: var(--secondary);
+    }
+    .npsn-badge i { color: var(--secondary); }
+
+    /* ===== STATS GRID ===== */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 28px; }
+
+    .stat-card { 
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 16px; padding: 22px;
+      transition: transform 0.3s, box-shadow 0.3s; position: relative; overflow: hidden;
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .stat-total::before { background: linear-gradient(90deg, #63D2BC, #4FC3F7); }
+    .stat-today::before { background: linear-gradient(90deg, #FFB74D, #FFA726); }
+    .stat-docs::before { background: linear-gradient(90deg, #FF6B9D, #FF8E72); }
+    .stat-complete::before { background: linear-gradient(90deg, #C9B1FF, #9575CD); }
+
+    .stat-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .stat-icon { 
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: white;
+    }
+    .stat-icon.total { background: linear-gradient(135deg, #63D2BC, #4FC3F7); }
+    .stat-icon.today { background: linear-gradient(135deg, #FFB74D, #FFA726); }
+    .stat-icon.docs { background: linear-gradient(135deg, #FF6B9D, #FF8E72); }
+    .stat-icon.complete { background: linear-gradient(135deg, #C9B1FF, #9575CD); }
+
+    .stat-trend { font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+    .trend-up { background: rgba(16,185,129,0.15); color: var(--success); }
+    .trend-neutral { background: rgba(116,192,252,0.15); color: var(--secondary); }
+
+    .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+
+    /* ===== TABLE SECTION ===== */
+    .table-section { 
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 16px; overflow: hidden; margin-bottom: 28px;
+    }
+
+    .table-header { 
+      padding: 20px 24px; display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 14px; border-bottom: 1px solid var(--border-color);
+    }
+
+    .table-title { 
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; 
+      display: flex; align-items: center; gap: 10px; margin: 0; flex-wrap: wrap;
+    }
+
+    .table-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    .btn-table { 
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px; font-size: 0.87rem;
+      font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: all 0.2s; border: none;
+    }
+    .btn-csv { 
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover)); color: white;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .btn-csv:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--accent-glow); }
+    .btn-refresh { background: var(--bg-hover); color: var(--text-primary); border: 1px solid var(--border-color); }
+    .btn-refresh:hover { background: var(--border-color); }
+
+    .search-wrapper { position: relative; width: 260px; }
+    .search-input { 
+      width: 100%; padding: 10px 16px 10px 42px; 
+      background: var(--bg-input); border: 1.5px solid var(--border-color); border-radius: 10px; 
+      font-size: 0.9rem; font-family: inherit; color: var(--text-primary); outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+    /* Data Table */
+    .data-table-wrapper { overflow-x: auto; }
+    .data-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+    .data-table th { 
+      background: var(--bg-secondary); padding: 14px 16px; text-align: left;
+      font-size: 0.82rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-color); white-space: nowrap;
+    }
+    .data-table td { padding: 14px 16px; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+    .data-table tbody tr { transition: background 0.15s; }
+    .data-table tbody tr:hover td { background: var(--bg-hover); }
+
+    .reg-number { font-family: 'Space Grotesk', sans-serif; font-weight: 600; color: var(--accent); font-size: 0.88rem; }
+    .student-name { font-weight: 600; color: var(--text-primary); }
+
+    .gender-badge { 
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+    }
+    .badge-laki { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-perempuan { background: rgba(255,107,157,0.15); color: #FF6B9D; }
+
+    .parent-info { font-size: 0.84rem; color: var(--text-secondary); }
+
+    .doc-icons { display: flex; gap: 8px; }
+    .doc-btn { 
+      width: 36px; height: 36px; border-radius: 10px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; cursor: pointer; transition: all 0.2s; border: none; color: white;
+    }
+    .doc-kk { background: linear-gradient(135deg, #FFB74D, #FFA726); }
+    .doc-akta { background: linear-gradient(135deg, #FF6B9D, #FF8E72); }
+    .doc-btn:hover { transform: scale(1.1); }
+    .doc-btn.disabled { background: #374151 !important; cursor: not-allowed; transform: none !important; }
+
+    .date-cell { font-size: 0.84rem; color: var(--text-muted); white-space: nowrap; }
+
+    .action-btn { 
+      padding: 7px 16px; border-radius: 8px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;
+      background: rgba(99,210,188,0.1); color: var(--accent); border: 1px solid rgba(99,210,188,0.25);
+    }
+    .action-btn:hover { background: rgba(99,210,188,0.2); }
+
+    /* Empty State */
+    .empty-table { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-table i { font-size: 3.5rem; margin-bottom: 16px; opacity: 0.35; }
+    .empty-table h3 { font-family: 'Space Grotesk'; margin-bottom: 8px; }
+
+    /* Skeleton Loading */
+    .table-skeleton { 
+      animation: shimmer 1.5s infinite;
+      background: linear-gradient(90deg, var(--bg-hover) 25%, var(--bg-card) 50%, var(--bg-hover) 75%);
+      background-size: 200% 100%; border-radius: 8px; height: 52px; margin: 8px 16px;
+    }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+    /* Pagination */
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 20px; border-top: 1px solid var(--border-color); }
+    .page-btn { 
+      width: 38px; height: 38px; border: 1px solid var(--border-color); background: var(--bg-secondary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.88rem; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; color: var(--text-primary); border-radius: 10px;
+    }
+    .page-btn:hover:not(:disabled) { background: var(--bg-hover); border-color: var(--accent); color: var(--accent); }
+    .page-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ===== DETAIL MODAL ===== */
+    .detail-modal-overlay { 
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+      z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .detail-modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .detail-modal { 
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 20px; max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto;
+      box-shadow: 0 25px 70px rgba(0,0,0,0.5); animation: slideUp 0.4s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .modal-head { 
+      background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+      color: white; padding: 24px 28px; border-radius: 20px 20px 0 0;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-head h3 { font-family: 'Space Grotesk'; font-size: 1.2rem; margin: 0; }
+
+    .modal-close-btn { 
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.2); border: none; 
+      color: white; font-size: 1.3rem; cursor: pointer; 
+      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+    }
+    .modal-close-btn:hover { background: rgba(255,255,255,0.35); }
+
+    .modal-body { padding: 24px 28px; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .detail-item { margin-bottom: 8px; }
+    .detail-label { font-size: 0.76rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .detail-value { font-size: 0.94rem; color: var(--text-primary); font-weight: 500; }
+    .detail-section-title { font-family: 'Space Grotesk'; color: var(--accent); font-size: 1.05rem; margin: 20px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+
+    .doc-preview-img { 
+      max-width: 100%; max-height: 250px; border-radius: 12px; border: 2px solid var(--border-color); 
+      object-fit: contain; margin-top: 8px; cursor: pointer; transition: transform 0.2s; background: var(--bg-secondary);
+    }
+    .doc-preview-img:hover { transform: scale(1.02); }
+
+    /* ===== TOAST ===== */
+    .toast-container { position: fixed; top: 80px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
+    .toast-item { 
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4); min-width: 280px; max-width: 400px; 
+      animation: slideInRight 0.3s ease; border-left: 4px solid var(--success);
+    }
+    .toast-item.error { border-left-color: var(--danger); }
+    .toast-item.warning { border-left-color: var(--warning); }
+    @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* ===== SAWER SECTION ===== */
+    .sawer-section { 
+      background: var(--bg-card); border: 2px dashed var(--border-color);
+      border-radius: 20px; padding: 36px 28px; margin-top: 32px; position: relative; overflow: hidden;
+    }
+
+    .sawer-header { text-align: center; margin-bottom: 24px; position: relative; z-index: 1; }
+    .sawer-emoji-row { font-size: 2.5rem; margin-bottom: 8px; animation: floatEmoji 3s ease-in-out infinite; }
+    @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    .sawer-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: var(--warning); margin-bottom: 6px; }
+    .sawer-subtitle { font-size: 0.94rem; color: var(--text-muted); font-style: italic; }
+
+    .sawer-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; position: relative; z-index: 1; }
+
+    .sawer-message { 
+      background: var(--bg-secondary); border-radius: 16px; padding: 22px;
+      border-left: 4px solid var(--warning);
+    }
+    .sawer-message p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+
+    .sawer-quote-box { 
+      background: rgba(245,158,11,0.08); border: 1px dashed rgba(245,158,11,0.2);
+      border-radius: 12px; padding: 14px 18px; font-style: italic; color: var(--text-muted); font-size: 0.88rem; text-align: center;
+    }
+
+    .sawer-qris-wrapper { background: var(--bg-secondary); border-radius: 16px; padding: 22px; text-align: center; }
+
+    .qris-image-container { 
+      width: 200px; height: 200px; margin: 0 auto 14px;
+      border-radius: 16px; overflow: hidden; border: 2px solid var(--border-color);
+      background: var(--bg-primary); display: flex; align-items: center; justify-content: center;
+    }
+    .qris-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .qris-label { font-size: 0.86rem; color: var(--text-muted); font-weight: 500; }
+    .qris-label i { color: var(--warning); margin-right: 6px; }
+
+    .sawer-footer { text-align: center; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border-color); position: relative; z-index: 1; }
+    .sawer-footer p { font-size: 0.87rem; color: var(--text-muted); margin: 4px 0; }
+    .heart-beat { color: var(--danger); animation: heartbeat 1.5s ease infinite; display: inline-block; }
+    @keyframes heartbeat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .sawer-body { grid-template-columns: 1fr; }
+      .welcome-banner { flex-direction: column; text-align: center; }
+      .welcome-right { align-items: center; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .search-wrapper { width: 100%; }
+      .table-header { flex-direction: column; align-items: stretch; }
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .dash-container { padding: 16px 12px 80px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .welcome-banner { padding: 18px; }
+      .sawer-section { padding: 24px 18px; }
+      .sawer-title { font-size: 1.2rem; }
+      .dash-user-info { display: none; }
+      .dash-logo-icon { width: 38px; height: 38px; font-size: 1.1rem; }
+      .stat-value { font-size: 1.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  </style>
+</head>
+
+<body class="dash-auth-pending">
+
+  <!-- Loader -->
+  <div class="dash-loader-overlay" id="dashLoader">
+    <div class="dash-loader-box">
+      <div class="dash-spinner"></div>
+      <div style="font-size:1.1rem;font-weight:600;margin-bottom:8px;">Memuat Dashboard...</div>
+      <div style="font-size:0.85rem;opacity:0.85;">Mohon tunggu sebentar</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="dash-header">
+    <div class="dash-header-content">
+      <a href="../index.html" class="dash-brand">
+        <div class="dash-logo-icon">🏫</div>
+        <div class="dash-title-group">
+          <div class="dash-title-main">PPDB Dashboard</div>
+          <div class="dash-title-sub">Tahun Ajaran 2026/2027</div>
+        </div>
+      </a>
+      <div class="dash-user-menu">
+        <div class="dash-user-info">
+          <div class="dash-user-name" id="headerUserName">Loading...</div>
+          <div class="dash-user-role" id="headerUserRole">Admin</div>
+        </div>
+        <button class="dash-avatar" id="userMenuBtn" title="Menu Akun" aria-label="Buka menu akun">👤</button>
+        <div id="userDropdown">
+          <a href="#" id="profileMenuBtn"><i class="fas fa-user-circle" style="color:var(--accent);"></i> Profil Saya</a>
+          <a href="super-admin.html" id="saMenuLink" class="sa-link-item" style="display:none;"><i class="fas fa-user-shield"></i> Panel Super Admin</a>
+          <button type="button" class="logout-btn-dropdown" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Keluar dari Sistem</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dash-container">
+
+    <div class="welcome-banner">
+      <div class="welcome-left">
+        <h2>Selamat Datang, <span id="welcomeName">Admin</span>! 🎉</h2>
+        <p>Berikut data pendaftaran untuk sekolah Anda.</p>
+      </div>
+      <div class="welcome-right">
+        <div class="school-badge"><i class="fas fa-school"></i> <span id="schoolBadgeName">Memuat...</span></div>
+        <div class="npsn-badge" id="npsnBadge" style="display:none;"><i class="fas fa-filter"></i> <span>NPSN: <strong id="npsnValue">-</strong></span></div>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card stat-total">
+        <div class="stat-header">
+          <div class="stat-icon total"><i class="fas fa-users"></i></div>
+          <span class="stat-trend trend-neutral">Total</span>
+        </div>
+        <div class="stat-value" id="statTotal">-</div>
+        <div class="stat-label">Total Pendaftar</div>
+      </div>
+      <div class="stat-card stat-today">
+        <div class="stat-header">
+          <div class="stat-icon today"><i class="fas fa-calendar-day"></i></div>
+          <span class="stat-trend trend-up">Hari Ini</span>
+        </div>
+        <div class="stat-value" id="statToday">-</div>
+        <div class="stat-label">Pendaftaran Baru</div>
+      </div>
+      <div class="stat-card stat-docs">
+        <div class="stat-header">
+          <div class="stat-icon docs"><i class="fas fa-file-image"></i></div>
+          <span class="stat-trend trend-neutral">Dokumen</span>
+        </div>
+        <div class="stat-value" id="statDocs">-</div>
+        <div class="stat-label">Lengkap (KK + Akta)</div>
+      </div>
+      <div class="stat-card stat-complete">
+        <div class="stat-header">
+          <div class="stat-icon complete"><i class="fas fa-check-double"></i></div>
+          <span class="stat-trend trend-up">Data OK</span>
+        </div>
+        <div class="stat-value" id="statComplete">-</div>
+        <div class="stat-label">Data Lengkap</div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-list-alt" style="color:var(--accent);"></i> Daftar Pendaftar
+          <span class="npsn-badge" id="tableNpsnBadge" style="display:none;margin-left:auto;font-size:0.72rem;padding:4px 10px;">
+            <i class="fas fa-shield-alt"></i> <span id="tableNpsnValue">-</span>
+          </span>
+        </h3>
+        <div class="table-actions">
+          <button class="btn-table btn-csv" id="downloadCsvBtn"><i class="fas fa-file-csv"></i> Download CSV</button>
+          <button class="btn-table btn-refresh" id="refreshTableBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <div class="search-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="searchInput" placeholder="Cari nama atau no daftar...">
+          </div>
+        </div>
+      </div>
+
+      <div class="data-table-wrapper">
+        <div id="tableLoading">
+          <div class="table-skeleton"></div><div class="table-skeleton"></div>
+          <div class="table-skeleton"></div><div class="table-skeleton"></div>
+          <div class="table-skeleton"></div>
+        </div>
+        <table class="data-table" id="dataTable" style="display:none;">
+          <thead>
+            <tr>
+              <th>No</th><th>No. Pendaftaran</th><th>Nama Calon Siswa</th>
+              <th>Jenis Kelamin</th><th>Ibu/Wali</th><th>No. HP</th>
+              <th>Dokumen</th><th>Tanggal Daftar</th><th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="empty-table" id="emptyState" style="display:none;">
+          <i class="fas fa-inbox"></i>
+          <h3>Belum Ada Pendaftar</h3>
+          <p>Data pendaftaran untuk sekolah Anda (NPSN: <strong id="emptyNpsn">-</strong>) akan muncul di sini.</p>
+        </div>
+      </div>
+
+      <div class="pagination" id="pagination" style="display:none;">
+        <button class="page-btn" id="prevBtn" disabled data-page-action="-1"><i class="fas fa-chevron-left"></i></button>
+        <span id="pageInfo" style="font-size:0.88rem;color:var(--text-muted);">Halaman 1</span>
+        <button class="page-btn" id="nextBtn" data-page-action="1"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <section class="sawer-section" id="sawerSection">
+      <div class="sawer-header">
+        <div class="sawer-emoji-row">☕🎉🙏</div>
+        <h2 class="sawer-title">Sawer Buat Ngopi Pembuat WBS 💝</h2>
+        <p class="sawer-subtitle">Dari ketulusan hati, untuk semangat berkarya terus...</p>
+      </div>
+      <div class="sawer-body">
+        <div class="sawer-message">
+          <p>Halo, <strong>Kawan Admin</strong> yang baik hati! 👋✨</p>
+          <p>Sistem PPDB ini lahir dari <em>banyak malam begadang</em>, <em>cangkir kopi yang tak terhitung</em>, dan semangat agar <strong>proses pendaftaran jadi lebih mudah</strong>.</p>
+          <p>Kalau merasa sistem ini membantu — boleh banget kok <strong>"ngopiin"</strong> saya! ☕</p>
+          <div class="sawer-quote-box">"Kode yang bagus seperti kopi enak — dibuat cinta, dinikmati senyuman."</div>
+        </div>
+        <div class="sawer-qris-wrapper">
+          <div class="qris-image-container">
+            <img src="../src/assets/qris-dana.jpg" alt="QRIS Dana" class="qris-img" id="dashboardQrisImg"
+                 onerror="this.parentElement.innerHTML='<div style=\'text-align:center;padding:20px;\'><i class=\'fas fa-image\' style=\'font-size:2.5rem;color:var(--text-muted);\'></i><p style=\'color:var(--text-muted);margin-top:8px;\'>QRIS belum tersedia</p>'">
+          </div>
+          <p class="qris-label"><i class="fas fa-qrcode"></i> Scan QRIS pakai <strong>DANA</strong> / e-Wallet</p>
+        </div>
+      </div>
+      <div class="sawer-footer">
+        <p><span class="heart-beat">❤️</span> Terima kasih sudah menjadi bagian dari perjalanan baik ini.</p>
+        <p style="font-size:0.8rem;color:var(--text-muted);margin-top:8px;">— Tim PPDB PAUD Banjar —</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Detail Modal -->
+  <div class="detail-modal-overlay" id="detailModal">
+    <div class="detail-modal">
+      <div class="modal-head">
+        <h3><i class="fas fa-user-graduate"></i> Detail Pendaftar</h3>
+        <button class="modal-close-btn" id="closeDetailModalBtn">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBodyContent"></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Helper Scripts -->
+  <script>
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('userDropdown');
+      if (dropdown) dropdown.classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('userDropdown');
+      const avatar = document.querySelector('.dash-avatar');
+      if (dropdown && !dropdown.contains(e.target) && avatar && !avatar.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+async function doLogout() {
+
+  if (!confirm('Apakah Anda yakin ingin keluar dari sistem?')) return;
+
+  try {
+
+    // logout supabase
+    if (window._supabase) {
+      await window._supabase.auth.signOut();
+    }
+
+  } catch (e) {
+
+    console.error('Logout error:', e);
+
+  }
+
+  // hapus semua cache login
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // paksa reload tanpa history
+  window.location.replace('login.html');
+}
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast-item ${type}`;
+      const icons = {
+        success: '<i class="fas fa-check-circle" style="color:var(--success);font-size:1.1rem;"></i>',
+        error: '<i class="fas fa-exclamation-circle" style="color:var(--danger);font-size:1.1rem;"></i>',
+        warning: '<i class="fas fa-exclamation-triangle" style="color:var(--warning);font-size:1.1rem;"></i>'
+      };
+      toast.innerHTML = `${icons[type] || icons.success}<span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease'; setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('userMenuBtn')?.addEventListener('click', toggleUserMenu);
+      document.getElementById('profileMenuBtn')?.addEventListener('click', (e) => { e.preventDefault(); showToast('Fitur profil segera hadir!', 'warning'); });
+      document.getElementById('logoutBtn')?.addEventListener('click', doLogout);
+      document.getElementById('downloadCsvBtn')?.addEventListener('click', () => { if (typeof window.downloadCSV === 'function') window.downloadCSV(); });
+      document.getElementById('refreshTableBtn')?.addEventListener('click', () => { if (typeof window.loadRegistrations === 'function') window.loadRegistrations(); });
+      document.getElementById('searchInput')?.addEventListener('input', () => { if (typeof window.filterTable === 'function') window.filterTable(); });
+      document.querySelectorAll('[data-page-action]').forEach(btn => {
+        btn.addEventListener('click', () => { if (typeof window.changePage === 'function') window.changePage(parseInt(btn.dataset.pageAction, 10)); });
+      });
+      document.getElementById('closeDetailModalBtn')?.addEventListener('click', () => { if (typeof window.closeDetailModal === 'function') window.closeDetailModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && typeof window.closeDetailModal === 'function') window.closeDetailModal(); });
+    });
+
+    (function initUserDisplay() {
+      const checkSession = setInterval(() => {
+        const userData = window.__USER_DATA;
+        if (userData) {
+          clearInterval(checkSession);
+          const name = userData.full_name || 'Admin';
+          safeText('headerUserName', name);
+          safeText('welcomeName', name.split(' ')[0]);
+          const roleLabels = { 'super_admin': 'Super Admin', 'admin': 'Administrator' };
+          safeText('headerUserRole', roleLabels[userData.role] || userData.role);
+          const saLink = document.getElementById('saMenuLink');
+          if (saLink) saLink.style.display = userData.role === 'super_admin' ? 'flex' : 'none';
+        }
+      }, 100);
+      setTimeout(() => clearInterval(checkSession), 5000);
+    })();
+
+    function safeText(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+
+    const loaderObserver = new MutationObserver(() => {
+      const loader = document.getElementById('dashLoader');
+      if (loader && document.documentElement.classList.contains('dash-auth-ready')) {
+        setTimeout(() => { loader.style.opacity = '0'; loader.style.transition = 'opacity 0.3s'; setTimeout(() => loader?.remove(), 300); }, 150);
+        loaderObserver.disconnect();
+      }
+    });
+    loaderObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+  </script>
+
+  <script type="module" src="../src/js/admin/dashboard.js"></script>
+</body>
+</html>

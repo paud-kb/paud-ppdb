@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FFB74D">
+  <title>Formulir Pendaftaran - PPDB PAUD Banjar</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Styles -->
+  <script type="module" src="/src/js/ppdb.js"></script>
+  
+  <style>
+    .school-info-bar {
+      background: var(--gradient-header);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    
+    .school-info-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .school-info-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.2);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    
+    .school-info-text {
+      line-height: 1.3;
+    }
+    
+    .school-info-name {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    .school-info-npsn {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+    
+    .change-school-btn {
+      padding: 6px 14px;
+      background: rgba(255,255,255,0.2);
+      border-radius: var(--radius-full);
+      color: white;
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      transition: var(--transition-fast);
+    }
+    
+    .change-school-btn:hover {
+      background: rgba(255,255,255,0.35);
+    }
+
+    /* Form Container */
+    .ppdb-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .form-header {
+      text-align: center;
+      padding: 32px 24px 24px;
+      background: linear-gradient(180deg, var(--off-white) 0%, var(--white) 100%);
+      border-bottom: 2px dashed var(--light-gray);
+    }
+
+    .form-header h2 {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+      color: var(--secondary-sky);
+    }
+
+    .form-header p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .form-progress {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .progress-step {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      background: var(--light-gray);
+      color: var(--gray);
+      position: relative;
+      transition: var(--transition-normal);
+    }
+
+    .progress-step.active {
+      background: var(--gradient-btn-primary);
+      color: white;
+      transform: scale(1.15);
+    }
+
+    .progress-step.completed {
+      background: var(--secondary-mint);
+      color: white;
+    }
+
+    .progress-line {
+      width: 40px;
+      height: 3px;
+      background: var(--light-gray);
+      align-self: center;
+      border-radius: var(--radius-full);
+      margin-bottom: 16px;
+    }
+
+    .progress-line.active {
+      background: var(--secondary-mint);
+    }
+
+    /* Form Sections */
+    .form-body {
+      padding: 28px 24px;
+    }
+
+    .form-section {
+      margin-bottom: 32px;
+      padding-bottom: 28px;
+      border-bottom: 2px dashed #F0E6E6;
+    }
+
+    .form-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--gradient-hero);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-right: 10px;
+    }
+
+    .form-section-title {
+      font-size: 1.2rem;
+      color: var(--primary-coral);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .form-section-title i {
+      color: var(--accent-yellow);
+    }
+
+    /* Form Groups */
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text-primary);
+    }
+
+    .form-group label i {
+      margin-right: 5px;
+      color: var(--secondary-sky);
+      font-size: 0.9rem;
+    }
+
+    .form-group label .required {
+      color: #EF5350;
+      margin-left: 2px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    /* Input Styles */
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      padding: 13px 16px;
+      border: 2px solid #E8E8E8;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.98rem;
+      transition: var(--transition-fast);
+      background: #FAFAFA;
+      color: var(--text-primary);
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--secondary-sky);
+      background: var(--white);
+      box-shadow: 0 0 0 4px rgba(116, 192, 252, 0.12);
+    }
+
+    .form-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2378909C' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-input::placeholder {
+      color: #BDBDBD;
+    }
+
+    /* Checkbox Group */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .checkbox-group:hover {
+      border-color: var(--primary-peach);
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--primary-pink);
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      margin: 0 !important;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* Wali Section (Toggleable) */
+    .wali-section {
+      display: none;
+      background: linear-gradient(135deg, #FFF5EB 0%, #FFFFFF 100%);
+      padding: 22px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--primary-peach);
+      animation: slideDown 0.3s ease;
+    }
+
+    .wali-section.active {
+      display: block;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================
+       UPLOAD SECTION STYLES
+       ========================================== */
+    .upload-section {
+      margin-top: 10px;
+    }
+
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .upload-box {
+      border: 3px dashed #D0D0D0;
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: center;
+      transition: var(--transition-normal);
+      background: var(--off-white);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .upload-box:hover {
+      border-color: var(--secondary-sky);
+      background: #F0F8FF;
+    }
+
+    .upload-box.has-file {
+      border-color: var(--secondary-mint);
+      border-style: solid;
+      background: linear-gradient(180deg, #F0FFF4 0%, #FFFFFF 100%);
+    }
+
+    .upload-box.error {
+      border-color: #EF5350;
+      background: #FFF5F5;
+    }
+
+    .upload-icon {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      color: var(--gray);
+    }
+
+    .upload-box.has-file .upload-icon {
+      color: var(--secondary-mint);
+    }
+
+    .upload-title {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .upload-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    .upload-input {
+      display: none;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--gradient-btn-secondary);
+      color: white;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: var(--transition-fast);
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(116, 192, 252, 0.35);
+    }
+
+    .upload-box.has-file .upload-btn {
+      background: var(--text-secondary);
+    }
+
+    /* Preview Area */
+    .preview-container {
+      margin-top: 16px;
+      display: none;
+    }
+
+    .preview-container.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .preview-image-wrapper {
+      position: relative;
+      display: inline-block;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      max-width: 100%;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      display: block;
+      border-radius: var(--radius-sm);
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    .preview-action-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition-fast);
+      border: none;
+      font-family: var(--font-body);
+    }
+
+    .btn-change {
+      background: var(--secondary-sky);
+      color: white;
+    }
+
+    .btn-remove {
+      background: #EF5350;
+      color: white;
+    }
+
+    .file-info {
+      margin-top: 8px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .file-info .size-ok { color: var(--secondary-mint); font-weight: 600; }
+    .file-info .size-warn { color: var(--accent-orange); font-weight: 600; }
+
+    /* Submit Button */
+    .submit-section {
+      padding: 28px 24px;
+      background: linear-gradient(180deg, var(--white) 0%, var(--off-white) 100%);
+      border-top: 2px dashed #F0E6E6;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 18px 28px;
+      background: var(--gradient-btn-primary);
+      border: none;
+      border-radius: var(--radius-full);
+      color: white;
+      font-size: 1.15rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+      cursor: pointer;
+      transition: var(--transition-normal);
+      box-shadow: 0 6px 24px rgba(255, 107, 157, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(255, 107, 157, 0.45);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-submit.loading {
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Agreement */
+    .agreement-check {
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .agreement-check label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .agreement-check input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-pink);
+    }
+
+    /* Success Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: var(--shadow-xl);
+      animation: scaleIn 0.3s ease;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .success-icon {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #63D2BC 0%, #4FC3F7 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      color: white;
+      margin: 0 auto 24px;
+      animation: bounceIn 0.6s ease;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    .modal-title {
+      font-family: var(--font-heading);
+      font-size: 1.6rem;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .modal-message {
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+
+    .registration-number {
+      display: inline-block;
+      background: var(--gradient-hero);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 16px 0;
+      letter-spacing: 1px;
+    }
+
+    .modal-note {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--light-gray);
+    }
+
+    .btn-home {
+      margin-top: 24px;
+      padding: 14px 36px;
+      background: var(--gradient-btn-secondary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: 1.05rem;
+      font-weight: 600;
+      font-family: var(--font-heading);
+      cursor: pointer;
+      transition: var(--transition-normal);
+    }
+
+    .btn-home:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(116, 192, 252, 0.4);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .school-info-bar {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+
+      .school-info-left {
+        flex-direction: column;
+      }
+
+      .form-header {
+        padding: 24px 16px 20px;
+      }
+
+      .form-body {
+        padding: 20px 16px;
+      }
+
+      .form-section {
+        margin-bottom: 26px;
+        padding-bottom: 24px;
+      }
+
+      .upload-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-step {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75rem;
+      }
+
+      .progress-line {
+        width: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== SCHOOL INFO BAR ==================== -->
+  <div class="school-info-bar" id="schoolInfoBar">
+    <div class="school-info-left">
+      <div class="school-info-icon">🏫</div>
+      <div class="school-info-text">
+        <div class="school-info-name" id="displaySchoolName">Memuat...</div>
+        <div class="school-info-npsn" id="displayNPSN">NPSN: -</div>
+      </div>
+    </div>
+    <a href="index.html" class="change-school-btn">
+      <i class="fas fa-exchange-alt"></i> Ganti Sekolah
+    </a>
+  </div>
+
+  <!-- ==================== FORM CONTAINER ==================== -->
+  <div class="ppdb-container">
+    <div class="form-card">
+
+      <!-- Header -->
+      <div class="form-header">
+        <h2><i class="fas fa-user-graduate"></i> Formulir Pendaftaran</h2>
+        <p>Silakan isi data dengan lengkap dan benar</p>
+        
+        <!-- Progress Steps -->
+        <div class="form-progress">
+          <div class="progress-step active" id="step1">1</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="step2">2</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="step3">3</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="step4">4</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="step5">5</div>
+          <div class="progress-line"></div>
+          <div class="progress-step" id="step6">📎</div>
+        </div>
+      </div>
+
+      <!-- Form Body -->
+      <form id="ppdbForm" novalidate>
+        <div class="form-body">
+
+          <!-- ========== SECTION 1: DATA SISWA ========== -->
+          <div class="form-section" data-section="1">
+            <h3 class="form-section-title">
+              <span class="section-number">1</span>
+              <i class="fas fa-child"></i> Data Calon Peserta Didik
+            </h3>
+
+            <div class="form-group">
+              <label><i class="fas fa-user"></i> Nama Lengkap <span class="required">*</span></label>
+              <input type="text" class="form-input" id="nama_lengkap" name="nama_lengkap" 
+                     placeholder="Sesuai akta kelahiran" required autocomplete="name">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-id-card"></i> NIK</label>
+                <input type="text" class="form-input" id="nik" name="nik" maxlength="30" 
+                       placeholder="Nomor Induk Kependudukan" inputmode="numeric">
+              </div>
+              <div class="form-group">
+                <label>Jenis Kelamin <span class="required">*</span></label>
+                <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
+                  <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                  <option value="L">Laki-laki</option>
+                  <option value="P">Perempuan</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> Tempat Lahir</label>
+                <input type="text" class="form-input" id="tempat_lahir" name="tempat_lahir" 
+                       placeholder="Kota/Kabupaten">
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-calendar-alt"></i> Tanggal Lahir</label>
+                <input type="date" class="form-input" id="tanggal_lahir" name="tanggal_lahir">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label><i class="fas fa-pray"></i> Agama</label>
+                <select class="form-select" id="agama" name="agama">
+                  <option value="Islam" selected>Islam</option>
+                  <option value="Kristen">Kristen</option>
+                  <option value="Katolik">Katolik</option>
+                  <option value="Hindu">Hindu</option>
+                  <option value="Buddha">Buddha</option>
+                  <option value="Konghucu">Konghucu</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label><i class="fas fa-flag"></i> Kewarganegaraan</label>
+                <input type="text" class="form-input" id="kewarganegaraan" name="kewarganegaraan" 
+                       value="WNI">
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== SECTION 2: ALAMAT ========== -->
+          <div class="form-section" data-section="2">
+            <h3 class="form-section-title">
+              <span class="section-number">2</span>
+              <i class="fas fa-home"></i> Alamat Tempat Tinggal
+            </h3>
+
+            <div class="form-group">
+              <label><i class="fas fa-map-pin"></i> Alamat Lengkap <span class="required">*</span></label>
+              <textarea class="form-textarea" id="alamat" name="alamat" 
+                        placeholder="Nama Jalan, Gang, No Rumah" required></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>RT</label>
+                <input type="text" class="form-input" id="rt" name="rt" maxlength="10" 
+                       placeholder="001" inputmode="numeric">
+              </div>
+              <div class="form-group">
+                <label>RW</label>
+                <input type="text" class="form-input" id="rw" name="rw" maxlength="10" 
+                       placeholder="002" inputmode="numeric">
+              </div>
+              <div class="form-group">
+                <label>Kode Pos</label>
+                <input type="text" class="form-input" id="kode_pos" name="kode_pos" maxlength="10" 
+                       placeholder="70311" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Kelurahan/Desa</label>
+                <input type="text" class="form-input" id="kelurahan" name="kelurahan">
+              </div>
+              <div class="form-group">
+                <label>Kecamatan</label>
+                <input type="text" class="form-input" id="kecamatan" name="kecamatan">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Kabupaten/Kota</label>
+                <input type="text" class="form-input" id="kabupaten_kota" name="kabupaten_kota">
+              </div>
+              <div class="form-group">
+                <label>Provinsi</label>
+                <input type="text" class="form-input" id="provinsi" name="provinsi" value="Jawa Barat">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tinggal Bersama</label>
+                <select class="form-select" id="tinggal_bersama" name="tinggal_bersama">
+                  <option value="Orang Tua" selected>Orang Tua</option>
+                  <option value="Wali">Wali</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Status Tempat Tinggal</label>
+                <select class="form-select" id="jenis_tinggal" name="jenis_tinggal">
+                  <option value="Milik Sendiri" selected>Milik Sendiri</option>
+                  <option value="Sewa/Kontrak">Sewa / Kontrak</option>
+                  <option value="Menumpang">Menumpang</option>
+                  <option value="Kos">Kos</option>
+                  <option value="Asrama">Asrama</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Moda Transportasi</label>
+                <select class="form-select" id="moda_transportasi" name="moda_transportasi">
+                  <option value="Jalan Kaki" selected>Jalan Kaki</option>
+                  <option value="Kendaraan Pribadi">Kendaraan Pribadi</option>
+                  <option value="Angkutan Umum">Angkutan Umum</option>
+                  <option value="Jemput Sekolah">Jemput Sekolah</option>
+                  <option value="Antar Jemput Keluarga">Antar Jemput Keluarga</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Jarak Tempuh (Meter)</label>
+                <input type="number" class="form-input" id="jarak_tempuh_m" name="jarak_tempuh_m" 
+                       placeholder="Contoh: 500" step="0.01" min="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== SECTION 3: DATA IBU ========== -->
+          <div class="form-section" data-section="3">
+            <h3 class="form-section-title">
+              <span class="section-number">3</span>
+              <i class="fas fa-female"></i> Data Ibu Kandung
+            </h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nama Ibu Kandung <span class="required">*</span></label>
+                <input type="text" class="form-input" id="nama_ibu_kandung" name="nama_ibu_kandung" required>
+              </div>
+              <div class="form-group">
+                <label>Tahun Lahir</label>
+                <input type="number" class="form-input" id="tahun_lahir_ibu" name="tahun_lahir_ibu" 
+                       placeholder="Contoh: 1990" min="1950" max="2020">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>NIK Ibu</label>
+                <input type="text" class="form-input" id="nik_ibu" name="nik_ibu" maxlength="30" 
+                       inputmode="numeric">
+              </div>
+              <div class="form-group">
+                <label>Pendidikan Terakhir</label>
+                <select class="form-select" id="pendidikan_ibu" name="pendidikan_ibu">
+                  <option value="">-- Pilih --</option>
+                  <option value="Tidak Sekolah">Tidak Sekolah</option>
+                  <option value="SD/Sederajat">SD / Sederajat</option>
+                  <option value="SMP/Sederajat">SMP / Sederajat</option>
+                  <option value="SMA/SMK/Sederajat">SMA / SMK / Sederajat</option>
+                  <option value="D1/D2/D3">D1 / D2 / D3</option>
+                  <option value="S1/D4">S1 / D4</option>
+                  <option value="S2">S2</option>
+                  <option value="S3">S3</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Pekerjaan</label>
+                <select class="form-select" id="pekerjaan_ibu" name="pekerjaan_ibu" onchange="handlePekerjaanChange('ibu', this.value)">
+                  <option value="">-- Pilih --</option>
+                  <option value="Tidak Bekerja">Tidak Bekerja</option>
+                  <option value="Meninggal">Meninggal</option>
+                  <option value="PNS/TNI/Polri">PNS / TNI / Polri</option>
+                  <option value="Karyawan Swasta">Karyawan Swasta</option>
+                  <option value="Wirausaha/Pedagang">Wirausaha / Pedagang</option>
+                  <option value="Petani/Peternak">Petani / Peternak</option>
+                  <option value="Buruh">Buruh</option>
+                  <option value="Guru/Dosen">Guru / Dosen</option>
+                  <option value="Tenaga Medis/Kesehatan">Tenaga Medis / Kesehatan</option>
+                  <option value="Pengacara/Hakim/Jaksa">Pengacara / Hakim / Jaksa</option>
+                  <option value="Pekerja Seni/Budaya/Pariwisata">Pekerja Seni / Budaya / Pariwisata</option>
+                  <option value="Imam/Pastor/Pendeta/Ulama">Imam / Pastor / Pendeta / Ulama</option>
+                  <option value="Pelajar/Mahasiswa">Pelajar / Mahasiswa</option>
+                  <option value="Ibu Rumah Tangga">Ibu Rumah Tangga</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>No. HP Ibu <span class="required">*</span></label>
+                <input type="tel" class="form-input" id="no_hp_ibu" name="no_hp_ibu" 
+                       placeholder="08xxxxxxxxxx" required inputmode="tel">
+              </div>
+            </div>
+
+            <div class="form-group" id="penghasilanIbuGroup">
+              <label><i class="fas fa-money-bill-wave"></i> Penghasilan per Bulan (Rp)</label>
+              <input type="number" class="form-input" id="penghasilan_ibu_per_bulan" name="penghasilan_ibu_per_bulan" 
+                     placeholder="Contoh: 5000000" min="0" step="100000">
+              <small style="color: var(--text-secondary); font-size: 0.82rem; margin-top: 4px; display: block;">
+                <i class="fas fa-info-circle"></i> Isi dalam Rupiah penuh (tanpa titik)
+              </small>
+            </div>
+          </div>
+
+          <!-- ========== SECTION 4: DATA AYAH ========== -->
+          <div class="form-section" data-section="4">
+            <h3 class="form-section-title">
+              <span class="section-number">4</span>
+              <i class="fas fa-male"></i> Data Ayah
+            </h3>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nama Ayah</label>
+                <input type="text" class="form-input" id="nama_ayah" name="nama_ayah">
+              </div>
+              <div class="form-group">
+                <label>Tahun Lahir</label>
+                <input type="number" class="form-input" id="tahun_lahir_ayah" name="tahun_lahir_ayah" 
+                       placeholder="Contoh: 1990" min="1950" max="2020">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>NIK Ayah</label>
+                <input type="text" class="form-input" id="nik_ayah" name="nik_ayah" maxlength="30" 
+                       inputmode="numeric">
+              </div>
+              <div class="form-group">
+                <label>Pendidikan Terakhir</label>
+                <select class="form-select" id="pendidikan_ayah" name="pendidikan_ayah">
+                  <option value="">-- Pilih --</option>
+                  <option value="Tidak Sekolah">Tidak Sekolah</option>
+                  <option value="SD/Sederajat">SD / Sederajat</option>
+                  <option value="SMP/Sederajat">SMP / Sederajat</option>
+                  <option value="SMA/SMK/Sederajat">SMA / SMK / Sederajat</option>
+                  <option value="D1/D2/D3">D1 / D2 / D3</option>
+                  <option value="S1/D4">S1 / D4</option>
+                  <option value="S2">S2</option>
+                  <option value="S3">S3</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Pekerjaan</label>
+                <select class="form-select" id="pekerjaan_ayah" name="pekerjaan_ayah" onchange="handlePekerjaanChange('ayah', this.value)">
+                  <option value="">-- Pilih --</option>
+                  <option value="Tidak Bekerja">Tidak Bekerja</option>
+                  <option value="Meninggal">Meninggal</option>
+                  <option value="PNS/TNI/Polri">PNS / TNI / Polri</option>
+                  <option value="Karyawan Swasta">Karyawan Swasta</option>
+                  <option value="Wirausaha/Pedagang">Wirausaha / Pedagang</option>
+                  <option value="Petani/Peternak">Petani / Peternak</option>
+                  <option value="Buruh">Buruh</option>
+                  <option value="Guru/Dosen">Guru / Dosen</option>
+                  <option value="Tenaga Medis/Kesehatan">Tenaga Medis / Kesehatan</option>
+                  <option value="Pengacara/Hakim/Jaksa">Pengacara / Hakim / Jaksa</option>
+                  <option value="Pekerja Seni/Budaya/Pariwisata">Pekerja Seni / Budaya / Pariwisata</option>
+                  <option value="Imam/Pastor/Pendeta/Ulama">Imam / Pastor / Pendeta / Ulama</option>
+                  <option value="Pelajar/Mahasiswa">Pelajar / Mahasiswa</option>
+                  <option value="Lainnya">Lainnya</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>No. HP Ayah</label>
+                <input type="tel" class="form-input" id="no_hp_ayah" name="no_hp_ayah" 
+                       placeholder="08xxxxxxxxxx" inputmode="tel">
+              </div>
+            </div>
+
+            <div class="form-group" id="penghasilanAyahGroup">
+              <label><i class="fas fa-money-bill-wave"></i> Penghasilan per Bulan (Rp)</label>
+              <input type="number" class="form-input" id="penghasilan_ayah_per_bulan" name="penghasilan_ayah_per_bulan" 
+                     placeholder="Contoh: 5000000" min="0" step="100000">
+              <small style="color: var(--text-secondary); font-size: 0.82rem; margin-top: 4px; display: block;">
+                <i class="fas fa-info-circle"></i> Isi dalam Rupiah penuh (tanpa titik)
+              </small>
+            </div>
+          </div>
+
+          <!-- ========== SECTION 5: DATA WALI ========== -->
+          <div class="form-section" data-section="5">
+            <h3 class="form-section-title">
+              <span class="section-number">5</span>
+              <i class="fas fa-user-shield"></i> Data Wali <small style="font-weight:400; color:var(--text-secondary);">(Opsional)</small>
+            </h3>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="ada_wali" name="ada_wali" onchange="toggleWaliSection()">
+              <label for="ada_wali">Centang jika anak didampingi/diasuh oleh Wali</label>
+            </div>
+
+            <div class="wali-section" id="waliSection">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Nama Wali</label>
+                  <input type="text" class="form-input" id="nama_wali" name="nama_wali">
+                </div>
+                <div class="form-group">
+                  <label>Hubungan dengan Anak</label>
+                  <input type="text" class="form-input" id="hubungan_wali" name="hubungan_wali" 
+                         placeholder="Contoh: Paman, Bibi, Nenek">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Pekerjaan Wali</label>
+                  <input type="text" class="form-input" id="pekerjaan_wali" name="pekerjaan_wali">
+                </div>
+                <div class="form-group">
+                  <label>No. HP Wali</label>
+                  <input type="tel" class="form-input" id="no_hp_wali" name="no_hp_wali" 
+                         placeholder="08xxxxxxxxxx" inputmode="tel">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Tahun Lahir Wali</label>
+                <input type="number" class="form-input" id="tahun_lahir_wali" name="tahun_lahir_wali" 
+                       placeholder="Contoh: 1975" min="1940" max="2020">
+              </div>
+            </div>
+          </div>
+
+          <!-- ========== SECTION 6: DATA FISIK & DOKUMEN ========== -->
+          <div class="form-section" data-section="6">
+            <h3 class="form-section-title">
+              <span class="section-number">6</span>
+              <i class="fas fa-weight-hanging"></i> Data Fisik & Upload Dokumen
+            </h3>
+
+            <!-- Data Fisik -->
+            <div class="form-row" style="margin-bottom: 24px;">
+              <div class="form-group">
+                <label>Berat Badan (kg)</label>
+                <input type="number" class="form-input" id="berat_badan_kg" name="berat_badan_kg" 
+                       step="0.01" placeholder="Contoh: 15.50" min="0">
+              </div>
+              <div class="form-group">
+                <label>Tinggi Badan (cm)</label>
+                <input type="number" class="form-input" id="tinggi_badan_cm" name="tinggi_badan_cm" 
+                       step="0.01" placeholder="Contoh: 105.00" min="0">
+              </div>
+            </div>
+
+            <!-- Upload Documents -->
+            <div class="upload-section">
+              <h4 style="margin-bottom: 16px; color: var(--primary-coral);">
+                <i class="fas fa-paperclip"></i> Unggah Dokumen Pendukung
+              </h4>
+              
+              <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 18px;">
+                <i class="fas fa-info-circle"></i> Format: JPG, PNG, WebP (Maks 5MB asli, akan di-compress otomatis max 200KB)
+              </p>
+
+              <div class="upload-grid">
+                
+                <!-- Upload KK -->
+                <div class="upload-box" id="uploadBoxKK" onclick="document.getElementById('inputKK').click()">
+                  <input type="file" class="upload-input" id="inputKK" accept="image/jpeg,image/png,image/webp" 
+                         onchange="handleFileSelect(this, 'kk')">
+                  
+                  <div class="upload-icon" id="iconKK">📄</div>
+                  <div class="upload-title">Kartu Keluarga (KK)</div>
+                  <div class="upload-subtitle" id="subKK">Klik untuk unggah foto KK</div>
+                  
+                  <button type="button" class="upload-btn" id="btnKK">
+                    <i class="fas fa-upload"></i> Pilih File
+                  </button>
+
+                  <div class="preview-container" id="previewKK">
+                    <div class="preview-image-wrapper">
+                      <img src="" alt="Preview KK" class="preview-image" id="imgPreviewKK">
+                    </div>
+                    <div class="file-info" id="fileInfoKK"></div>
+                    <div class="preview-actions">
+                      <button type="button" class="preview-action-btn btn-change" onclick="event.stopPropagation(); document.getElementById('inputKK').click()">
+                        <i class="fas fa-redo"></i> Ganti
+                      </button>
+                      <button type="button" class="preview-action-btn btn-remove" onclick="removeFile('kk')">
+                        <i class="fas fa-trash"></i> Hapus
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Upload Akta -->
+                <div class="upload-box" id="uploadBoxAkta" onclick="document.getElementById('inputAkta').click()">
+                  <input type="file" class="upload-input" id="inputAkta" accept="image/jpeg,image/png,image/webp" 
+                         onchange="handleFileSelect(this, 'akta')">
+                  
+                  <div class="upload-icon" id="iconAkta">📜</div>
+                  <div class="upload-title">Akta Kelahiran</div>
+                  <div class="upload-subtitle" id="subAkta">Klik untuk unggah foto Akta</div>
+                  
+                  <button type="button" class="upload-btn" id="btnAkta">
+                    <i class="fas fa-upload"></i> Pilih File
+                  </button>
+
+                  <div class="preview-container" id="previewAkta">
+                    <div class="preview-image-wrapper">
+                      <img src="" alt="Preview Akta" class="preview-image" id="imgPreviewAkta">
+                    </div>
+                    <div class="file-info" id="fileInfoAkta"></div>
+                    <div class="preview-actions">
+                      <button type="button" class="preview-action-btn btn-change" onclick="event.stopPropagation(); document.getElementById('inputAkta').click()">
+                        <i class="fas fa-redo"></i> Ganti
+                      </button>
+                      <button type="button" class="preview-action-btn btn-remove" onclick="removeFile('akta')">
+                        <i class="fas fa-trash"></i> Hapus
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </div><!-- end upload-grid -->
+            </div><!-- end upload-section -->
+
+          </div><!-- end section 6 -->
+
+        </div><!-- end form-body -->
+
+        <!-- Submit Section -->
+        <div class="submit-section">
+          <div class="agreement-check">
+            <label>
+              <input type="checkbox" id="agreeCheck" required>
+              Silahkan Klik kotak putih di sebelah kiri dan menyatakan data di atas adalah benar dan dapat dipertanggungjawabkan
+            </label>
+          </div>
+
+          <!-- Di dalam .submit-section, tambahkan ini -->
+          <div class="submit-progress" id="submitProgress" style="display:none; margin-top:16px;">
+            <div class="progress-step-item" id="progressStep1">
+              <i class="fas fa-circle-notch fa-spin"></i> Mengompres gambar...
+            </div>
+            <div class="progress-step-item" id="progressStep2" style="display:none;">
+              <i class="fas fa-circle-notch fa-spin"></i> Mengunggah dokumen...
+            </div>
+            <div class="progress-step-item" id="progressStep3" style="display:none;">
+              <i class="fas fa-circle-notch fa-spin"></i> Menyimpan ke database...
+            </div>
+          </div>
+
+          <style>
+          .submit-progress {
+            background: var(--bg-input);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 12px;
+          }
+          .progress-step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+          }
+          .progress-step-item.done {
+            color: var(--success);
+          }
+          .progress-step-item.done i {
+            color: var(--success);
+          }
+          </style>
+          
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <i class="fas fa-paper-plane"></i>
+            <span>Kirim Pendaftaran</span>
+          </button>
+        </div>
+
+      </form>
+    </div><!-- end form-card -->
+  </div><!-- end container -->
+
+  <!-- Success Modal -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-content">
+      <div class="success-icon">✅</div>
+      <h2 class="modal-title">Pendaftaran Berhasil!</h2>
+      <p class="modal-message">Terima kasih! Data putra-putri Anda telah terdaftar.</p>
+      <p style="font-size: 0.92rem; color: var(--text-secondary);">Nomor Pendaftaran Anda:</p>
+      <div class="registration-number" id="regNumberDisplay">-</div>
+      <p class="modal-note">
+        <i class="fas fa-info-circle"></i> Silakan screenshot atau catat nomor pendaftaran ini.<br>
+        Informasi selanjutnya akan dikirim melalui WhatsApp.
+      </p>
+      <button class="btn-home" onclick="window.location.href='index.html'">
+        <i class="fas fa-home"></i> Kembali ke Beranda
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  
+  <script type="module" src="/src/js/ppdb.js"></script>
+</body>
+</html>

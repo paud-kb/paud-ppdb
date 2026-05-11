@@ -1,0 +1,114 @@
+{
+  "name": "PPDB PAUD Banjar 2026/2027",
+  "short_name": "PPDB PAUD",
+  "description": "Sistem Penerimaan Peserta Didik Baru PAUD Kabupaten/Kota Banjar - Tahun Ajaran 2026/2027",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#FF6B9D",
+  "background_color": "#FFF9F5",
+  "categories": ["education", "children"],
+  "lang": "id",
+  "dir": "ltr",
+
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%23FF6B9D'/><stop offset='50%25' style='stop-color:%23FFB74D'/><stop offset='100%25' style='stop-color:%234FC3F7'/></linearGradient></defs><rect width='512' height='512' rx='108' fill='url(%23g)'/><text x='256' y='180' text-anchor='middle' fill='white' font-size='140' font-family='Arial Black'>🎒</text><text x='256' y='320' text-anchor='middle' fill='white' font-size='72' font-weight='bold' font-family='Arial'>PPDB</text><text x='256' y='385' text-anchor='middle' fill='rgba(255,255,255,0.85)' font-size='42' font-family='Arial'>PAUD</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23FF6B9D'/><text x='96' y='110' text-anchor='middle' fill='white' font-size='80'>🎒</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 144 144'><rect width='144' height='144' rx='30' fill='%23FFB74D'/><text x='72' y='85' text-anchor='middle' fill='white' font-size='60'>📝</text></svg>",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' rx='20' fill='%234FC3F7'/><text x='48' y='58' text-anchor='middle' fill='white' font-size='40'>P</text></svg>",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><rect width='48' height='48' rx='10' fill='%2363D2BC'/><text x='24' y='32' text-anchor='middle' fill='white' font-size='22'>🎒</text></svg>",
+      "sizes": "48x48",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect width='1280' height='720' fill='%23FFF9F5'/%3E%3Crect y='0' width='1280' height='70' fill='%2374C0FC'/%3E%3Ctext x='60' y='45' fill='white' font-size='24' font-family='Arial'%3EPPDB PAUD Banjar%3C/text%3E%3Ctext x='120' y='150' fill='%233747F4' font-size='52' font-family='Arial' font-weight='bold'%3ESelamat Datang di PPDB Online%3C/text%3E%3Ctext x='120' y='220' fill='%2378909C' font-size='28' font-family='Arial'%3EDaftarkan putra-putri Anda dengan mudah%3C/text%3E%3Crect x='120' y='280' width='400' height='220' rx='20' fill='white' stroke='%23E8E8E8' stroke-width='2'/%3E%3Ctext x='160' y='330' fill='%234FC3F7' font-size='36'%3E🏫 KB Melati 1%3C/text%3E%3Ctext x='160' y='380' fill='%2378909C' font-size='18'%3ENPSN: 69767888%3C/text%3E%3Crect x='600' y='280' width='400' height='220' rx='20' fill='white' stroke='%23E8E8E8' stroke-width='2'/%3E%3Ctext x='640' y='330' fill='%23FF6B9D' font-size='36'%3E🏫 TK Aisyiyah%3C/text%3E%3Ctext x='640' y='380' fill='%2378909C' font-size='18'%3ENPSN: 12345678%3C/text%3E%3Crect x='120' y='540' width='1040' height='60' rx='30' fill='%23FF6B9D'/%3E%3Ctext x='640' y='578' text-anchor='middle' fill='white' font-size='22' font-weight='bold'%3ELanjutkan Pendaftaran →%3C/text%3E%3C/svg%3E",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Halaman Utama - Pilih Sekolah"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='720' height='1280'%3E%3Crect width='720' height='1280' fill='%23FFFFFF'/%3E%3Crect y='0' width='720' height='65' fill='%2363D2BC'/%3E%3Ctext x='35' y='43' fill='white' font-size='20' font-family='Arial'%3EFormulir Pendaftaran%3C/text%3E%3Crect x='20' y='85' width='680' height='1150' rx='16' fill='%23FAFAFA' stroke='%23EEE' stroke-width='1'/%3E%3Ccircle cx='360' cy='170' r='45' fill='%23E3F2FD'/%3E%3Ctext x='360' y='182' text-anchor='middle' font-size='40'%3E1%3C/text%3E%3Ctext x='360' y='250' text-anchor='middle' fill='%233747F4' font-size='18' font-weight='bold' font-family='Arial'%3EData Calon Siswa%3C/text%3E%3Crect x='40' y='280' width='640' height='50' rx='10' fill='white' stroke='%23DDD'/%3E%3Ctext x='60' y='312' fill='%23AAA' font-size='15'%3ENama Lengkap *%3C/text%3E%3Crect x='40' y='350' width='310' height='50' rx='10' fill='white' stroke='%23DDD'/%3E%3Ctext x='60' y='382' fill='%23AAA' font-size='15'%3ENIK%3C/text%3E%3Crect x='370' y='350' width='310' height='50' rx='10' fill='white' stroke='%23DDD'/%3E%3Ctext x='390' y='382' fill='%23AAA' font-size='15'%3EJenis Kelamin *%3C/text%3E%3Crect x='40' y='420' width='640' height='80' rx='10' fill='white' stroke='%23DDD'/%3E%3Ctext x='60' y='450' fill='%23AAA' font-size='15'%3EAlamat Lengkap *%3C/text%3E%3Crect x='40' y='520' width='640' height='55' rx='28' fill='%23FF6B9D'/%3E%3Ctext x='360' y='554' text-anchor='middle' fill='white' font-size='17' font-weight='bold'%3EKirim Pendaftaran ✉️%3C/text%3E%3C/svg%3E",
+      "sizes": "720x1280",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "Formulir Pendaftaran"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Daftar Siswa Baru",
+      "short_name": "Daftar",
+      "description": "Langsung ke halaman pendaftaran",
+      "url": "/ppdb.html",
+      "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' rx='20' fill='%23FF6B9D'/><text x='48' y='58' text-anchor='middle' fill='white' font-size='40'>📝</text></svg>", "sizes": "96x96" }]
+    },
+    {
+      "name": "Login Admin",
+      "short_name": "Admin",
+      "description": "Masuk ke panel admin",
+      "url": "/admin/login.html",
+      "icons": [{ "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect width='96' height='96' rx='20' fill='%2374C0FC'/><text x='48' y='58' text-anchor='middle' fill='white' font-size='40'>🔐</text></svg>", "sizes": "96x96" }]
+    }
+  ],
+
+  "related_applications": [],
+  "prefer_related_applications": false,
+
+  "handle_links": "preferred",
+  "capture_links": "existing-client-navigate-new",
+
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+
+  "protocol_handlers": [],
+
+  "file_handlers": [],
+
+  "share_target": {
+    "action": "/index.html?action=share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+
+  "display_override": ["window-controls-overlay", "standalone"],
+
+  "id": "ppdb-paud-banjar-2026",
+  "note": "Sistem PPDB Online untuk PAUD Kota Banjar Jawa Barat"
+}

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a1628">
+  <meta name="description" content="PPDB Online PAUD Banjar - Tahun Ajaran 2026/2027. Daftarkan putra-putri Anda dengan mudah!">
+  <!-- PWA Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PPDB PAUD">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='38' fill='%23FF6B9D'/><text x='90' y='105' text-anchor='middle' fill='white' font-size='90'>🎒</text></svg>">
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <title>PPDB PAUD Banjar 2026/2027</title>
+    <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Favicon (SVG inline) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%2310b981'/><text x='50' y='68' text-anchor='middle' fill='white' font-size='50' font-weight='bold' font-family='Arial'>🎒</text></svg>">
+</head>
+<body>
+  <!-- ==================== HEADER ==================== -->
+  <header class="header" id="mainHeader">
+    <div class="nav-wrapper">
+      <!-- Brand Logo -->
+      <a href="index.html" class="brand">
+        <div class="brand-logo">🎒</div>
+        <div class="brand-text">
+          <span class="brand-name">PPDB PAUD Banjar</span>
+          <span class="brand-tagline">Tahun Ajaran 2026/2027</span>
+        </div>
+      </a>
+      <!-- Hamburger Menu -->
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+  <!-- Mobile Menu Overlay -->
+  <div class="mobile-menu-overlay" id="menuOverlay"></div>
+  <!-- Mobile Menu Panel -->
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="index.html" class="mobile-menu-item">
+      <i class="fas fa-home"></i> Beranda
+    </a>
+    <div class="mobile-menu-divider"></div>
+    <a href="admin/login.html" class="mobile-menu-item">
+      <i class="fas fa-user-shield"></i> Daftar/Login Admin
+    </a>
+    <a href="#" class="mobile-menu-item" onclick="showToast('Fitur segera hadir!', 'warning')">
+      <i class="fas fa-info-circle"></i> Bantuan
+    </a>
+    <div class="mobile-menu-divider"></div>
+    <a href="#" class="mobile-menu-item" onclick="showToast('Terima kasih! ❤️', 'success')">
+      <i class="fas fa-heart"></i> Tentang Kami
+    </a>
+  </nav>
+  <!-- ==================== HERO SECTION ==================== -->
+  <section class="hero-section">
+    <!-- Background Pattern -->
+    <div class="hero-bg-pattern">
+      <div class="floating-shape shape-1"></div>
+      <div class="floating-shape shape-2"></div>
+      <div class="floating-shape shape-3"></div>
+      <div class="floating-shape shape-4"></div>
+    </div>
+    <div class="hero-content">
+      <!-- Badge -->
+      <div class="hero-badge">
+        <i class="fas fa-star"></i>
+        Pendaftaran Dibuka!
+      </div>
+      <!-- Title -->
+      <h1 class="hero-title">
+        Selamat Datang di<br>
+        <span class="highlight">PPDB Online PAUD</span><br>
+        Kota Banjar Jawa Barat
+      </h1>
+      <!-- Subtitle -->
+      <p class="hero-subtitle">
+        Daftarkan putra-putri tercinta Anda dengan mudah dan cepat. 
+        Pilih sekolah favorit di bawah ini! 🌟
+      </p>
+      <!-- TAMBAHKAN INI SETELAS hero-subtitle -->
+<div class="hero-actions">
+  <a href="#schoolSection" class="btn btn-primary btn-large">
+    <span>Daftar Paud Sekarang</span>
+    <i class="fas fa-arrow-right"></i>
+  </a>
+</div>
+      <!-- Illustration Cards -->
+      <div class="hero-illustration">
+        <div class="illustration-card">
+          <div class="illustration-icon">👶</div>
+          <span class="illustration-label">Usia 1-6 Tahun</span>
+        </div>
+        <div class="illustration-card">
+          <div class="illustration-icon">📝</div>
+          <span class="illustration-label">Daftar Online</span>
+        </div>
+        <div class="illustration-card">
+          <div class="illustration-icon">🏫</div>
+          <span class="illustration-label">PAUD Berkualitas</span>
+        </div>
+        <div class="illustration-card">
+          <div class="illustration-icon">🎨</div>
+          <span class="illustration-label">Belajar Menyenangkan</span>
+        </div>
+      </div>
+    </div>
+  </section>
+<!-- ==================== SCHOOL SELECTION SECTION ==================== -->
+<section class="school-section" id="schoolSection">
+  <div class="section-title">
+    <h2>🏫 Pilih Sekolah Tujuan</h2>
+    <p>Pilih sekolah PAUD tempat mendaftar putra-putri Anda</p>
+  </div>
+  <!-- Loading Skeleton -->
+  <div class="school-grid" id="schoolGridLoading">
+    <div class="skeleton skeleton-card"></div>
+    <div class="skeleton skeleton-card"></div>
+    <div class="skeleton skeleton-card"></div>
+  </div>
+  <!-- School Dropdown -->
+  <div
+    class="school-dropdown-wrapper"
+    id="schoolGrid"
+    style="display:none;"
+  >
+    <!-- Search -->
+    <div class="school-search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        id="schoolSearchInput"
+        placeholder="Ayo Cari Paud Favoritmu..."
+        autocomplete="off"
+      >
+    </div>
+    <!-- Select School -->
+    <select
+      id="schoolSelect"
+      class="school-dropdown"
+    >
+      <option value="">
+        -- Pilih Sekolah Tujuan --
+      </option>
+    </select>
+  </div>
+  <!-- Empty State -->
+  <div
+    class="empty-state"
+    id="emptyState"
+    style="display:none;"
+  >
+    <div class="empty-state-icon">😢</div>
+    <h3>Belum Ada Sekolah Tersedia</h3>
+    <p>
+      Silakan hubungi administrator untuk informasi lebih lanjut.
+    </p>
+  </div>
+  <!-- Error State -->
+  <div
+    class="empty-state"
+    id="errorState"
+    style="display:none;"
+  >
+    <div class="empty-state-icon">⚠️</div>
+    <h3>Gagal Memuat Data</h3>
+    <p id="errorMessage">
+      Terjadi kesalahan. Silakan coba lagi.
+    </p>
+    <button
+      class="btn btn-secondary"
+      style="margin-top:20px;"
+      onclick="loadSchools()"
+    >
+      <i class="fas fa-redo"></i>
+      Coba Lagi
+    </button>
+  </div>
+  <!-- Next Button -->
+  <div
+    class="next-button-container"
+    id="nextButtonContainer"
+    style="display:none;"
+  >
+    <button
+      class="btn btn-primary btn-large"
+      id="nextBtn"
+      disabled
+      onclick="window.goToRegistration()"
+    >
+      <span>
+        Pilih Sekolah Terlebih Dahulu
+      </span>
+      <i class="fas fa-arrow-right"></i>
+    </button>
+  </div>
+</section>
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer">
+    <p class="footer-text">
+      © 2026 By Ade Susandi Demi Kemajuan Bersama Dinas Pendidikan Kota Banjar.
+    </p>
+  </footer>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const schoolSelect =
+      document.getElementById('schoolSelect');
+    const searchInput =
+      document.getElementById('schoolSearchInput');
+    // observer dropdown
+    const observer = new MutationObserver(() => {
+      // jika option sudah dimuat app.js
+      if (schoolSelect.options.length > 1) {
+        document.getElementById('schoolGridLoading')
+          .style.display = 'none';
+        document.getElementById('schoolGrid')
+          .style.display = 'flex';
+      }
+    });
+    observer.observe(schoolSelect, {
+      childList: true
+    });
+    // fitur cari
+    searchInput.addEventListener('input', function () {
+      const keyword =
+        this.value.toLowerCase();
+      Array.from(schoolSelect.options)
+        .forEach((option, index) => {
+        if (index === 0) return;
+        const text =
+          option.textContent.toLowerCase();
+        option.hidden =
+          !text.includes(keyword);
+      });
+    });
+  });
+  </script>
+<!-- ==================== SCRIPTS ==================== -->
+<script type="module" src="/src/js/app.js"></script>
+    <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => {
+            console.log('[PWA] SW registered:', reg.scope);
+            
+            // Check for updates
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New version available - could show notification
+                  console.log('[PWA] New version available!');
+                }
+              });
+            });
+          })
+          .catch(err => console.error('[PWA] SW registration failed:', err));
+      });
+    }
+    // Install Prompt Handler
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Show custom install button after a delay
+      setTimeout(showInstallButton, 3000);
+    });
+    function showInstallButton() {
+      if (deferredPrompt && !localStorage.getItem('pwa_installed')) {
+        const btn = document.createElement('div');
+        btn.id = 'pwaInstallBtn';
+        btn.innerHTML = `
+          <div style="
+            position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+            z-index:9999; animation:slideUpBanner 0.5s ease;
+          ">
+            <button onclick="installPWA()" style="
+              display:flex;align-items:center;gap:10px;
+              padding:14px 28px;background:linear-gradient(135deg,#FF6B9D,#FF8E72);
+              color:white;border:none;border-radius:50px;font-size:1rem;
+              font-weight:700;font-family:'Fredoka',sans-serif;
+              cursor:pointer;box-shadow:0 6px 24px rgba(255,107,157,0.4);
+              transition:all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-3px)'"
+               onmouseout="this.style.transform='translateY(0)'">
+              📲 Install Aplikasi PPDB PAUD
+            </button>
+          </div>
+          <style>
+            @keyframes slideUpBanner {
+              from{transform:translateX(-50%) translateY(100px);opacity:0}
+              to{transform:translateX(-50%) translateY(0);opacity:1}
+            }
+          </style>
+        `;
+        document.body.appendChild(btn);
+      }
+    }
+    async function installPWA() {
+      if (!deferredPrompt) return;
+      
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        localStorage.setItem('pwa_installed', 'true');
+        console.log('[PWA] App installed!');
+      }
+      deferredPrompt = null;
+      
+      // Remove button
+      const btn = document.getElementById('pwaInstallBtn');
+      if (btn) btn.remove();
+    }
+    // Hide install button if already installed
+    window.addEventListener('appinstalled', () => {
+      localStorage.setItem('pwa_installed', 'true');
+      const btn = document.getElementById('pwaInstallBtn');
+      if (btn) btn.remove();
+      console.log('[PWA] App was installed!');
+    });
+  </script>
+</body>
+</html>
