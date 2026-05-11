@@ -2,7 +2,7 @@
 // GLOBAL VARIABLES
 // ==========================================
 import '../css/style.css';
-import { supabaseClient } from '../config/supabase.js';
+import { supabase } from '../config/supabase.js';
 
 let selectedSchool = null;
 let schoolsData = [];
@@ -112,7 +112,7 @@ async function loadSchools() {
 
   try {
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from('schools')
       .select('*')
       .eq('is_active', true)

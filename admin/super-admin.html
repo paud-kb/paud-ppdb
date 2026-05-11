@@ -979,15 +979,15 @@
 
     <!-- Auth Check Script -->
     <script type="module">
-        import { supabaseClient } from '/src/config/supabase.js';
+        import { supabase } from '/src/config/supabase.js';
         
         try {
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            const { data: { session }, error } = await supabase.auth.getSession();
             
             if (!session || error) {
                 window.location.replace('/admin/login.html');
             } else {
-                const { data: me } = await supabaseClient
+                const { data: me } = await supabase
                     .from('users')
                     .select('*')
                     .eq('email', session.user.email)
@@ -1357,7 +1357,7 @@
 
         async function doLogout() {
             if (!confirm('Yakin ingin keluar?')) return;
-            await (await import('/src/config/supabase.js')).supabaseClient.auth.signOut();
+            await (await import('/src/config/supabase.js')).supabase.auth.signOut();
             localStorage.clear(); sessionStorage.clear();
             window.location.replace('/admin/login.html');
         }

@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0f172a">
     <title>Login Admin - PPDB PAUD Banjar</title>
-    
+    <link
+    rel="icon"
+    type="image/png"
+    sizes="512x512"
+    href="/icon512x512.png">
+    <link
+    rel="apple-touch-icon"
+    href="/icon512x512.png">
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -232,34 +239,39 @@
         }
 
         /* Mobile Brand */
-        .mobile-brand { 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            margin-bottom: 32px; 
-        }
-        
-        @media (min-width: 1024px) { 
-            .mobile-brand { display: none; } 
-        }
-        
-        .mobile-logo { 
-            width: 52px; 
-            height: 52px; 
-            background: linear-gradient(135deg, var(--accent), #059669); 
-            border-radius: 14px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 26px; 
-        }
-        
-        .mobile-brand-text { 
-            font-family: 'Space Grotesk', sans-serif; 
-            font-size: 22px; 
-            font-weight: 700; 
-        }
+.mobile-brand{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
+.brand-logo{
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.brand-logo img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mobile-brand-text{
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
         /* Card Header */
         .card-header { margin-bottom: 32px; }
         
@@ -644,10 +656,10 @@
 <div class="login-left">
     <div class="left-bg-pattern"></div>
     <div class="left-grid"></div>
-    
-    <div class="left-content">
-        <div class="brand-logo-large">🎒</div>
-        
+        <div class="left-content">
+        <div class="brand-logo">
+        <img src="/icon192x192.png" alt="PPDB PAUD">
+        </div>        
         <h1 class="left-title">
             Sistem PPDB<br>
             <span class="highlight">PAUD Banjar</span>
@@ -702,10 +714,11 @@
 <!-- ==================== RIGHT PANEL (Login Form) ==================== -->
 <div class="login-right">
     <div class="login-card">
-
         <!-- Mobile Brand -->
         <div class="mobile-brand">
-            <div class="mobile-logo">🎒</div>
+        <div class="brand-logo">
+        <img src="/icon192x192.png" alt="PPDB PAUD">
+        </div>  
             <span class="mobile-brand-text">PPDB PAUD</span>
         </div>
 

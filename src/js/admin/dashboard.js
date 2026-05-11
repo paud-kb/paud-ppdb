@@ -2,7 +2,7 @@
 // DASHBOARD.JS v10.0 - DARK THEME + CLEAN
 // ==========================================
 
-import { supabaseClient } from '../../config/supabase.js';
+import { supabase } from '../../config/supabase.js';
 
 const Dash = {
   user: null,
@@ -17,11 +17,11 @@ const Dash = {
 
 document.addEventListener('DOMContentLoaded', async function() {
   try {
-    const { data: { session }, error: sessErr } = await supabaseClient.auth.getSession();
+    const { data: { session }, error: sessErr } = await supabase.auth.getSession();
     if (sessErr) throw new Error('Session error');
     if (!session) throw new Error('No active session');
 
-    const { data: userData, error: userErr } = await supabaseClient
+    const { data: userData, error: userErr } = await supabase
       .from('users')
       .select('*')
       .eq('id', session.user.id)
@@ -96,7 +96,7 @@ function hideLoader() {
 async function loadRegistrations() {
   toggleLoading(true);
   try {
-    let query = supabaseClient.from('registrations').select('*', { count: 'exact' }).order('created_at', { ascending: false });
+    let query = supabase.from('registrations').select('*', { count: 'exact' }).order('created_at', { ascending: false });
     if (Dash.user.role !== 'super_admin' && Dash.npsn) query = query.eq('npsn', Dash.npsn);
     const { data, error } = await query;
     if (error) throw error;
@@ -118,7 +118,7 @@ async function loadSchoolInfo() {
   try {
     if (Dash.user.role === 'super_admin') { Dash.schoolName = 'Semua Sekolah'; }
     else if (Dash.npsn) {
-      const { data } = await supabaseClient.from('schools').select('nama_sekolah').eq('npsn', Dash.npsn).maybeSingle();
+      const { data } = await supabase.from('schools').select('nama_sekolah').eq('npsn', Dash.npsn).maybeSingle();
       Dash.schoolName = data?.nama_sekolah || `NPSN ${Dash.npsn}`;
     } else { Dash.schoolName = 'Sekolah'; }
     safeText('schoolBadgeName', Dash.schoolName);
@@ -210,7 +210,7 @@ window.changePage = changePage;
 function viewDoc(path, label) {
   if (!path) { showToast(`${label} tidak tersedia`, 'warning'); return; }
   try {
-    const { data } = supabaseClient.storage.from('npsn-banjar').getPublicUrl(path);
+    const { data } = supabase.storage.from('npsn-banjar').getPublicUrl(path);
     if (!data?.publicUrl) { showToast('Dokumen gagal dibuka', 'error'); return; }
     window.open(data.publicUrl, '_blank');
   } catch (e) { showToast('Gagal membuka dokumen', 'error'); }
@@ -223,8 +223,8 @@ function showDetail(id) {
 
   let kkUrl = null, aktaUrl = null;
   try {
-    if (r.url_kk) kkUrl = supabaseClient.storage.from('npsn-banjar').getPublicUrl(r.url_kk).data.publicUrl;
-    if (r.url_akta) aktaUrl = supabaseClient.storage.from('npsn-banjar').getPublicUrl(r.url_akta).data.publicUrl;
+    if (r.url_kk) kkUrl = supabase.storage.from('npsn-banjar').getPublicUrl(r.url_kk).data.publicUrl;
+    if (r.url_akta) aktaUrl = supabase.storage.from('npsn-banjar').getPublicUrl(r.url_akta).data.publicUrl;
   } catch (e) {}
 
   const mc = document.getElementById('modalBodyContent');

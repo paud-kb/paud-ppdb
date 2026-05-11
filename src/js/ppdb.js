@@ -1,7 +1,7 @@
 // ==========================================
 // GLOBAL STATE
 // ==========================================
-import { supabaseClient } from '../config/supabase.js'
+import { supabase } from '../config/supabase.js'
 import '../css/style1.css';
 
 const AppState = {
@@ -67,7 +67,7 @@ function updateSchoolInfo() {
 
 async function fetchSchoolName(npsn) {
   try {
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from('schools')
       .select('nama_sekolah')
       .eq('npsn', npsn)
@@ -438,7 +438,7 @@ async function uploadToStorage(compressedBlob, studentName, docType) {
   console.log(`[Storage] Uploading to: ${filePath}`);
   console.log(`[Storage] Blob size: ${(compressedBlob.size / 1024).toFixed(1)}KB`);
   
-  const { data, error } = await supabaseClient.storage
+  const { data, error } = await supabase.storage
     .from('npsn-banjar')
     .upload(filePath, compressedBlob, {
       cacheControl: '3600',
@@ -545,7 +545,7 @@ async function handleFormSubmit(e) {
     
     console.log('[Submit] Saving to DB:', saveData);
     
-    const { data: insertedData, error: insertError } = await supabaseClient
+    const { data: insertedData, error: insertError } = await supabase
       .from('registrations')
       .insert(saveData)
       .select('nomor_pendaftaran') // ← AMBIL HASIL DARI TRIGGER

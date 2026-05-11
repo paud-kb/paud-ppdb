@@ -5,7 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#0a1628">
   <title>Registrasi Admin Sekolah - PPDB PAUD Banjar</title>
-  
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="/icon192x192.png">
+    <link
+    rel="apple-touch-icon"
+    href="/icon512x512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -352,14 +359,13 @@
     }
   </style>
 </head>
-
 <body>
-
 <div class="reg-container">
-  
-  <!-- Header -->
+    <!-- Header -->
   <div class="reg-header">
-    <div class="reg-logo">🏫</div>
+  <div class="brand-logo">
+  <img src="/icon192x192.png" alt="PPDB PAUD">
+  </div>   
     <h1 class="reg-title">Registrasi Admin Sekolah</h1>
     <p class="reg-subtitle">Ajukan akses admin untuk mengelola data pendaftaran</p>
   </div>
@@ -503,8 +509,8 @@
 
 <!-- Logic Script -->
 <script type="module">
-  import { supabaseClient } from './src/config/supabase.js';
-  window._supabase = supabaseClient;
+  import { supabase } from './src/config/supabase.js';
+  window._supabase = supabase;
 
   // ==========================================
   // STATE
@@ -540,7 +546,7 @@ async function handleNpsnLookup() {
     console.log('[REG] Checking NPSN:', npsn);
 
     // Cek apakah sudah ada request pending
-    const { data: pendingReq, error: pendingErr } = await supabaseClient
+    const { data: pendingReq, error: pendingErr } = await supabase
       .from('admin_requests')
       .select('id')
       .eq('npsn', npsn)
@@ -692,7 +698,7 @@ window.handleRegister = async function(e) {
     // ==========================================
     // CEK DUPLICATE REQUEST
     // ==========================================
-    const { data: dupReq, error: dupErr } = await supabaseClient
+    const { data: dupReq, error: dupErr } = await supabase
       .from('admin_requests')
       .select('id')
       .eq('npsn', npsn)
@@ -715,7 +721,7 @@ window.handleRegister = async function(e) {
     // INSERT REQUEST
     // ==========================================
     const { data: requestData, error: insertError } =
-      await supabaseClient
+      await supabase
         .from('admin_requests')
         .insert({
           npsn: npsn,

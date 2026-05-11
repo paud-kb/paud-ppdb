@@ -2,7 +2,7 @@
 // LOGIN.JS v3.0 - SUPABASE AUTH ONLY
 // ==========================================
 
-import { supabaseClient } from '../../config/supabase.js';
+import { supabase } from '../../config/supabase.js';
 
 window.addEventListener('load', () => {
     const loader = document.getElementById('initLoader');
@@ -15,7 +15,7 @@ checkExistingSession();
 
 async function checkExistingSession() {
     try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
             const userData = await getUserData(session.user.id);
             if (userData) redirectToDashboard(userData);
@@ -57,7 +57,7 @@ window.showToast = showToast;
 
 async function getUserData(userId) {
     try {
-        const { data: user, error } = await supabaseClient.from('users').select('*').eq('id', userId).single();
+        const { data: user, error } = await supabase.from('users').select('*').eq('id', userId).single();
         if (error) throw error;
         return user;
     } catch (err) { return null; }
@@ -123,7 +123,7 @@ async function handleLogin(e) {
         btnText.innerText = "Memproses...";
         btnSpinner.style.display = "inline-block";
 
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password
         });

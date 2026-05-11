@@ -8,7 +8,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
-export const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
     auth: {
@@ -33,15 +33,15 @@ const SA = {
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        if (!supabaseClient) throw new Error('supabaseClient is NULL');
+        if (!supabase) throw new Error('supabase is NULL');
 
-        const { data: { session }, error: sessErr } = await supabaseClient.auth.getSession();
+        const { data: { session }, error: sessErr } = await supabase.auth.getSession();
         if (sessErr || !session) {
             window.location.replace('/admin/login.html');
             return;
         }
 
-        const { data: me, error: meErr } = await supabaseClient
+        const { data: me, error: meErr } = await supabase
             .from('users')
             .select('*')
             .eq('email', session.user.email)
