@@ -473,7 +473,7 @@
   <!-- Header -->
   <header class="dash-header">
     <div class="dash-header-content">
-      <a href="../index.html" class="dash-brand">
+      <a href="/index.html" class="dash-brand">
         <div class="dash-logo-icon">🏫</div>
         <div class="dash-title-group">
           <div class="dash-title-main">PPDB Dashboard</div>
@@ -488,7 +488,7 @@
         <button class="dash-avatar" id="userMenuBtn" title="Menu Akun" aria-label="Buka menu akun">👤</button>
         <div id="userDropdown">
           <a href="#" id="profileMenuBtn"><i class="fas fa-user-circle" style="color:var(--accent);"></i> Profil Saya</a>
-          <a href="super-admin.html" id="saMenuLink" class="sa-link-item" style="display:none;"><i class="fas fa-user-shield"></i> Panel Super Admin</a>
+          <a href="/admin/super-admin.html" id="saMenuLink" class="sa-link-item" style="display:none;"><i class="fas fa-user-shield"></i> Panel Super Admin</a>
           <button type="button" class="logout-btn-dropdown" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Keluar dari Sistem</button>
         </div>
       </div>
@@ -607,7 +607,7 @@
         </div>
         <div class="sawer-qris-wrapper">
           <div class="qris-image-container">
-            <img src="../src/assets/qris-dana.jpg" alt="QRIS Dana" class="qris-img" id="dashboardQrisImg"
+            <img src="/src/assets/qris-dana.jpg" alt="QRIS Dana" class="qris-img" id="dashboardQrisImg"
                  onerror="this.parentElement.innerHTML='<div style=\'text-align:center;padding:20px;\'><i class=\'fas fa-image\' style=\'font-size:2.5rem;color:var(--text-muted);\'></i><p style=\'color:var(--text-muted);margin-top:8px;\'>QRIS belum tersedia</p>'">
           </div>
           <p class="qris-label"><i class="fas fa-qrcode"></i> Scan QRIS pakai <strong>DANA</strong> / e-Wallet</p>
@@ -670,7 +670,7 @@ async function doLogout() {
   sessionStorage.clear();
 
   // paksa reload tanpa history
-  window.location.replace('login.html');
+  window.location.replace('/admin/login.html');
 }
 
     function showToast(message, type = 'success') {
@@ -734,6 +734,6 @@ async function doLogout() {
     loaderObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
   </script>
 
-  <script type="module" src="../src/js/admin/dashboard.js"></script>
+  <script type="module" src="/src/js/admin/dashboard.js"></script>
 </body>
 </html>

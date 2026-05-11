@@ -65,7 +65,7 @@ function handleFatalError(message) {
     <p style="color:var(--text-secondary);margin:0;font-size:0.95rem;max-width:420px;line-height:1.6;">${message}</p>
     <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;">
       <button onclick="location.reload()" style="padding:12px 28px;background:var(--accent);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95rem;">🔄 Refresh Halaman</button>
-      <button onclick="localStorage.clear();location.href='login.html'" style="padding:12px 28px;background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border-color);border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95rem;">🔑 Login Ulang</button>
+      <button onclick="localStorage.clear();location.href='/admin/login.html'" style="padding:12px 28px;background:var(--bg-card);color:var(--text-secondary);border:1px solid var(--border-color);border-radius:10px;font-weight:600;cursor:pointer;font-size:0.95rem;">🔑 Login Ulang</button>
     </div>
   `;
   document.body.appendChild(errDiv);

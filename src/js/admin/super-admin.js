@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const { data: { session }, error: sessErr } = await supabaseClient.auth.getSession();
         if (sessErr || !session) {
-            window.location.replace('login.html');
+            window.location.replace('/admin/login.html');
             return;
         }
 

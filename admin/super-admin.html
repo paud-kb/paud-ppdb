@@ -979,13 +979,13 @@
 
     <!-- Auth Check Script -->
     <script type="module">
-        import { supabaseClient } from '../src/config/supabase.js';
+        import { supabaseClient } from '/src/config/supabase.js';
         
         try {
             const { data: { session }, error } = await supabaseClient.auth.getSession();
             
             if (!session || error) {
-                window.location.replace('login.html');
+                window.location.replace('/admin/login.html');
             } else {
                 const { data: me } = await supabaseClient
                     .from('users')
@@ -995,7 +995,7 @@
                 
                 if (!me || me.role !== 'super_admin') {
                     alert('Akses ditolak! Hanya Super Admin.');
-                    window.location.replace('dashboard.html');
+                    window.location.replace('/admin/dashboard.html');
                 } else {
                     window.__SA_USER = me;
                     document.documentElement.classList.remove('dash-auth-pending');
@@ -1007,7 +1007,7 @@
             }
         } catch (err) {
             console.error('[Auth] Error:', err.message);
-            window.location.replace('login.html');
+            window.location.replace('/admin/login.html');
         }
 
         function updateUserInfoDisplay(user) {
@@ -1043,7 +1043,7 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="../index.html" class="logo">
+            <a href="/index.html" class="logo">
                 <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
                 <div>
                     <div class="logo-text">AdminPanel</div>
@@ -1055,14 +1055,14 @@
         <nav class="nav-section">
             <div class="nav-label">Menu Utama</div>
             
-            <a class="nav-item active" href="super-admin.html">
+            <a class="nav-item active" href="#">
                 <i class="fas fa-user-cog"></i>
                 <span>User Management</span>
             </a>
             
             <div class="nav-label">System</div>
             
-            <a class="nav-item" href="#">
+            <a class="nav-item" href="/admin/settings.html">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
@@ -1103,7 +1103,7 @@
                             <div style="font-weight:600;font-size:14px;" id="dropdownName">Super Admin</div>
                             <div style="font-size:12px;color:var(--text-muted);" id="dropdownEmail">admin@ppdb.id</div>
                         </div>
-                        <button class="dropdown-item" onclick="window.location.href='dashboard.html'">
+                        <button class="dropdown-item" onclick="window.location.href='/admin/dashboard.html'">
                             <i class="fas fa-chart-line"></i> Ke Dashboard
                         </button>
                         <div class="dropdown-divider"></div>
@@ -1334,7 +1334,7 @@
 
     <!-- Module Script -->
     <!-- ✅ YANG BENAR -->
-    <script type="module" src="../src/js/admin/super-admin.js"></script>
+    <script type="module" src="/src/js/admin/super-admin.js"></script>
 
     <!-- Helper Scripts (Non-Module) -->
     <script>
@@ -1357,9 +1357,9 @@
 
         async function doLogout() {
             if (!confirm('Yakin ingin keluar?')) return;
-            try { await (await import('../src/config/supabase.js')).supabaseClient.auth.signOut(); } catch(e) {}
+            await (await import('/src/config/supabase.js')).supabaseClient.auth.signOut();
             localStorage.clear(); sessionStorage.clear();
-            window.location.replace('login.html');
+            window.location.replace('/admin/login.html');
         }
         window.doLogout = doLogout;
 

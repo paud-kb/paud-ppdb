@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (!AppState.npsn) {
     showToast('NPSN tidak ditemukan. Silakan pilih sekolah kembali.', 'error');
-    setTimeout(() => window.location.href = 'index.html', 2000);
+    setTimeout(() => window.location.href = '/index.html', 2000);
     return;
   }
   
