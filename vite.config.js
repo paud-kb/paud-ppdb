@@ -1,22 +1,31 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const root = fileURLToPath(new URL('.', import.meta.url));
 
 export default defineConfig({
+  // Base path
+  base: '/',
+  
+  // Public directory (untuk static files)
+  publicDir: 'public',
+  
+  // Development server
   server: {
-    open: true
+    port: 3000,
+    open: true, // Auto open browser
+    strictPort: false
   },
+  
+  // Build options
   build: {
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(root, 'index.html'),
-        ppdb: resolve(root, 'ppdb.html'),
-        registrasi: resolve(root, 'registrasi.html'),
-        'admin-login': resolve(root, 'admin/login.html'),
-        'admin-dashboard': resolve(root, 'admin/dashboard.html'),
-        'admin-super': resolve(root, 'admin/super-admin.html'),
+        main: './index.html',
+        ppdb: './ppdb.html',
+        registrasi: './registrasi.html',
+        'admin-login': './admin/login.html',
+        'admin-dashboard': './admin/dashboard.html',
+        'admin-super': './admin/super-admin.html'
       }
     }
   }

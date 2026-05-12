@@ -977,52 +977,6 @@
 
     </style>
 
-    <!-- Auth Check Script -->
-    <script type="module">
-        import { supabase } from '/src/config/supabase.js';
-        
-        try {
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
-            if (!session || error) {
-                window.location.replace('/admin/login.html');
-            } else {
-                const { data: me } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', session.user.email)
-                    .maybeSingle();
-                
-                if (!me || me.role !== 'super_admin') {
-                    alert('Akses ditolak! Hanya Super Admin.');
-                    window.location.replace('/admin/dashboard.html');
-                } else {
-                    window.__SA_USER = me;
-                    document.documentElement.classList.remove('dash-auth-pending');
-                    document.documentElement.classList.add('dash-auth-ready');
-                    
-                    // Update UI
-                    setTimeout(() => updateUserInfoDisplay(me), 100);
-                }
-            }
-        } catch (err) {
-            console.error('[Auth] Error:', err.message);
-            window.location.replace('/admin/login.html');
-        }
-
-        function updateUserInfoDisplay(user) {
-            if (!user) return;
-            const initials = (user.full_name || 'SA').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            const name = user.full_name || 'Super Admin';
-            
-            document.getElementById('sidebarUserName').textContent = name;
-            document.getElementById('sidebarAvatar').textContent = initials;
-            document.getElementById('headerUserName').textContent = name.split(' ')[0];
-            document.getElementById('headerAvatar').textContent = initials;
-            document.getElementById('dropdownName').textContent = name;
-            document.getElementById('dropdownEmail').textContent = user.email || 'admin@ppdb.id';
-        }
-    </script>
 </head>
 <body class="dash-auth-pending">
 
@@ -1371,6 +1325,5 @@
             }
         }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     </script>
-
 </body>
 </html>

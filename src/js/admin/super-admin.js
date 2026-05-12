@@ -1,21 +1,12 @@
 // ==========================================
-// SUPER-ADMIN.JS v5.0 - APPROVE WITH PASSWORD
+// SUPER-ADMIN.JS v6.0 - SECURE WITH API ROUTES
 // ==========================================
+// PERUBAHAN UTAMA:
+// - Service role key TIDAK ADA di frontend
+// - Semua operasi admin lewat API routes (server-side)
+// - Frontend hanya menggunakan anon key untuk auth session
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
-    auth: {
-        persistSession: false,
-        autoRefreshToken: false
-    }
-});
+import { supabase } from '/src/config/supabase.js';
 
 // ==========================================
 // GLOBAL STATE
@@ -25,7 +16,8 @@ const SA = {
     filtered: [],
     currentTarget: null,
     currentUser: null,
-    isReady: false
+    isReady: false,
+    authToken: null  // Token untuk API requests
 };
 
 // ==========================================
@@ -40,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.replace('/admin/login.html');
             return;
         }
+
+        // Simpan auth token untuk API requests
+        SA.authToken = session.access_token;
 
         const { data: me, error: meErr } = await supabase
             .from('users')
@@ -73,6 +68,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
+// API REQUEST HELPER
+// ==========================================
+
+/**
+ * Fetch API dengan authorization header
+ * @param {string} url - API endpoint
+ * @param {Object} options - Fetch options
+ * @returns {Promise<Object>} - Response data
+ */
+async function fetchAPI(url, options = {}) {
+    if (!SA.authToken) {
+        throw new Error('No authentication token available');
+    }
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SA.authToken}`,
+        ...options.headers
+    };
+
+    const response = await fetch(url, {
+        ...options,
+        headers
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return data;
+}
+
+// ==========================================
 // LOADER
 // ==========================================
 function hideLoader() {
@@ -85,22 +115,16 @@ function hideLoader() {
 }
 
 // ==========================================
-// LOAD REQUESTS
+// LOAD REQUESTS (via API)
 // ==========================================
 async function loadRequests() {
     try {
         saToast('Memuat data pengajuan...', 'info');
 
-        if (!supabaseAdmin) throw new Error('supabaseAdmin is not initialized');
+        // Panggil API instead of direct database access
+        const result = await fetchAPI('/api/admin/admin-requests');
 
-        const { data, error } = await supabaseAdmin
-            .from('admin_requests')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        SA.requests = data || [];
+        SA.requests = result.data || [];
         SA.filtered = [...SA.requests];
 
         renderTable(SA.filtered);
@@ -387,7 +411,7 @@ function checkPasswordStrength(pw) {
 }
 
 // ==========================================
-// APPROVE - EXECUTE
+// APPROVE - EXECUTE (via API)
 // ==========================================
 async function executeApprove() {
     if (!SA.currentTarget) {
@@ -415,96 +439,27 @@ async function executeApprove() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-        // ── STEP 1: Hash password via RPC ──
-        const { data: hashResult, error: hashError } = await supabaseAdmin.rpc('hash_password', {
-            plain_text: password
-        });
-        if (hashError) throw new Error('Hash gagal: ' + hashError.message);
-        const passwordHash = hashResult;
-
-                // ── STEP 2: Create Supabase Auth user ──
-        let authUserId;
-        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-            email: request.email,
-            password: password,
-            email_confirm: true,
-            user_metadata: {
-                full_name: request.nama_lengkap,
-                role: 'admin',
-                npsn: request.npsn
-            }
-        });
-
-        if (authError) {
-            const msg = (authError.message || '').toLowerCase();
-            if (msg.includes('already registered') || msg.includes('already been registered') || msg.includes('user already exists')) {
-                throw new Error('Email "' + request.email + '" sudah terdaftar di Auth. Gunakan email lain.');
-            }
-            throw new Error('Gagal buat akun Auth: ' + authError.message);
-        }
-        authUserId = authData.user.id;
-
-        // ── STEP 3: Insert school (harus duluan, FK users.npsn → schools.npsn) ──
-        const { error: schoolErr } = await supabaseAdmin
-            .from('schools')
-            .insert({
-                npsn: request.npsn,
-                nama_sekolah: request.nama_sekolah,
-                password_hash: passwordHash,
-                is_active: true
-            });
-
-        if (schoolErr) {
-            const msg = (schoolErr.message || '').toLowerCase();
-            if (!msg.includes('duplicate') && !msg.includes('unique')) {
-                try { await supabaseAdmin.auth.admin.deleteUser(authUserId); } catch(e) {}
-                throw new Error('Gagal buat sekolah: ' + schoolErr.message);
-            }
-        }
-
-        // ── STEP 4: Insert user (id = auth user id) ──
-        const { error: userErr } = await supabaseAdmin
-            .from('users')
-            .insert({
-                id: authUserId,
-                username: request.username_desired,
-                password_hash: passwordHash,
-                full_name: request.nama_lengkap,
-                email: request.email,
-                no_hp: request.no_hp,
-                role: 'admin',
-                npsn: request.npsn,
-                is_active: true,
-                is_verified: false,
-                created_by: SA.currentUser?.id
-            });
-
-        if (userErr) {
-            try { await supabaseAdmin.auth.admin.deleteUser(authUserId); } catch(e) {}
-            const msg = (userErr.message || '').toLowerCase();
-            if (msg.includes('duplicate') || msg.includes('unique')) {
-                throw new Error('Username "' + request.username_desired + '" sudah digunakan!');
-            }
-            throw new Error('Gagal buat user: ' + userErr.message);
-        }
-
-        // ── STEP 5: Update admin_requests ──
-        const { data: updateData, error: updateErr } = await supabaseAdmin
-            .from('admin_requests')
-            .update({
-                status: 'approved',
-                reviewed_by: SA.currentUser?.id,
-                reviewed_at: new Date().toISOString()
+        // Panggil API approve-request
+        const result = await fetchAPI('/api/admin/approve-request', {
+            method: 'POST',
+            body: JSON.stringify({
+                requestId: id,
+                plainPassword: password
             })
-            .eq('id', id)
-            .select('id, status');
+        });
 
-        if (updateErr) throw updateErr;
-        if (!updateData || updateData.length === 0) {
-            throw new Error('UPDATE gagal: tidak ada baris yang terupdate. ID: ' + id);
+        if (!result.success) {
+            throw new Error(result.error || 'Gagal menyetujui request');
         }
+
+        // Tampilkan password result
+        showPasswordResult(request, result.data.plainPassword);
+
+        // Reload data
+        await loadRequests();
 
     } catch (err) {
+        console.error('[SA] executeApprove error:', err);
         saToast('Gagal menyetujui: ' + err.message, 'error');
 
         btn.disabled = false;
@@ -562,7 +517,7 @@ function closeApproveModal() {
 window.closeApproveModal = closeApproveModal;
 
 // ==========================================
-// REJECT FUNCTIONS
+// REJECT FUNCTIONS (via API)
 // ==========================================
 function openRejectModal(id, name, email) {
     SA.currentTarget = { id, name, email };
@@ -594,23 +549,25 @@ async function executeReject() {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
         }
 
-        const { error } = await supabaseAdmin
-            .from('admin_requests')
-            .update({
-                status: 'rejected',
-                rejection_reason: reason,
-                reviewed_by: SA.currentUser?.id,
-                reviewed_at: new Date().toISOString()
+        // Panggil API reject-request
+        const result = await fetchAPI('/api/admin/reject-request', {
+            method: 'POST',
+            body: JSON.stringify({
+                requestId: id,
+                rejectionReason: reason
             })
-            .eq('id', id);
+        });
 
-        if (error) throw error;
+        if (!result.success) {
+            throw new Error(result.error || 'Gagal menolak request');
+        }
 
-        saToast(`"${name}" ditolak`, 'warning');
+        saToast(result.data.message || `"${name}" ditolak`, 'warning');
         closeRejectModal();
         await loadRequests();
 
     } catch (err) {
+        console.error('[SA] executeReject error:', err);
         saToast('Gagal menolak: ' + err.message, 'error');
 
         const btn = document.getElementById('confirmRejectBtn');
@@ -651,27 +608,6 @@ function closeRejectModal() {
     SA.currentTarget = null;
 }
 window.closeRejectModal = closeRejectModal;
-
-// ==========================================
-// ROW ACTION HELPERS
-// ==========================================
-function disableRowActions(id) {
-    const row = document.querySelector(`tr[data-id="${id}"]`);
-    if (row) {
-        row.querySelectorAll('button').forEach(btn => {
-            btn.disabled = true;
-        });
-    }
-}
-
-function enableRowActions(id) {
-    const row = document.querySelector(`tr[data-id="${id}"]`);
-    if (row) {
-        row.querySelectorAll('button').forEach(btn => {
-            btn.disabled = false;
-        });
-    }
-}
 
 // ==========================================
 // UTILITY
