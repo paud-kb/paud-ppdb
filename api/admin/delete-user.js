@@ -1,21 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Validate environment variables
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabaseAdmin = createClient({
-  url: supabaseUrl,
+console.log('[DEBUG] supabaseUrl:', supabaseUrl ? 'SET' : 'NOT SET');
+console.log('[DEBUG] supabaseServiceRoleKey:', supabaseServiceRoleKey ? 'SET' : 'NOT SET');
+
+if (!supabaseUrl || typeof supabaseUrl !== 'string') {
+  console.error('[DEBUG] VITE_SUPABASE_URL is invalid!');
+  // Return handler yang returns error
+}
+
+if (!supabaseServiceRoleKey) {
+  console.error('[DEBUG] SUPABASE_SERVICE_ROLE_KEY is not set!');
+  // Return handler yang returns error
+}
+
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false
-  },
-  global: {
-    headers: {
-      apikey: supabaseServiceRoleKey
-    }
   }
 });
-
 export default async function handler(req, res) {
     try {
         // Method check
