@@ -89,7 +89,7 @@
             width: 260px;
             height: 100vh;
             background: var(--bg-secondary);
-            border-right: 1px solid var(--border-color);
+            border-right:1px solid var(--border-color);
             z-index: 100;
             transition: transform 0.3s ease;
             display: flex;
@@ -105,7 +105,7 @@
 
         .sidebar-header {
             padding: 24px 20px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom:1px solid var(--border-color);
             background: linear-gradient(135deg, rgba(139,92,246,0.08) 0%, transparent 100%);
         }
 
@@ -648,6 +648,75 @@
         .action-btn.view:hover { border-color: var(--info); color: var(--info); background: rgba(59,130,246,0.1); }
         .action-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
 
+        /* Action Button Text */
+        .action-btn-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-color);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .action-btn-text.approve {
+            color: var(--success);
+            border-color: rgba(16,185,129,0.35);
+        }
+        .action-btn-text.approve:hover {
+            background: rgba(16,185,129,0.12);
+            border-color: var(--success);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(16,185,129,0.2);
+        }
+
+        .action-btn-text.reject {
+            color: var(--danger);
+            border-color: rgba(239,68,68,0.35);
+        }
+        .action-btn-text.reject:hover {
+            background: rgba(239,68,68,0.12);
+            border-color: var(--danger);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(239,68,68,0.2);
+        }
+
+        .action-btn-text:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* School info cell */
+        .school-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .school-cell .school-name {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .school-cell .school-npsn {
+            font-family: 'Courier New', monospace;
+            background: rgba(16,185,129,0.08);
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: var(--success);
+            font-weight: 600;
+            font-size: 11px;
+            display: inline-block;
+            width: fit-content;
+        }
+
         /* Empty State */
         .empty-state {
             text-align: center;
@@ -726,7 +795,7 @@
 
         .modal-body { padding: 26px; }
 
-        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .detail-grid { display: grid; grid-template-columns:1fr 1fr; gap: 16px; }
 
         .detail-item { margin-bottom: 10px; }
 
@@ -771,139 +840,6 @@
         }
 
         .reject-textarea:focus { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
-
-        /* Toast */
-        .toast-container {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 300;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            max-width: 400px;
-        }
-
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            animation: slideInRight 0.35s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .toast::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 4px;
-        }
-
-        .toast.success::before { background: var(--success); }
-        .toast.error::before { background: var(--danger); }
-        .toast.warning::before { background: var(--warning); }
-        .toast.info::before { background: var(--info); }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(100px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .toast-icon { font-size: 18px; flex-shrink: 0; }
-        .toast.success .toast-icon { color: var(--success); }
-        .toast.error .toast-icon { color: var(--danger); }
-        .toast.warning .toast-icon { color: var(--warning); }
-        .toast-message { flex: 1; font-size: 14px; line-height: 1.4; }
-        .toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 15px; }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-
-        /* Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-                /* Action Button Text (Approve/Reject besar) */
-        .action-btn-text {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1.5px solid var(--border-color);
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            white-space: nowrap;
-        }
-
-        .action-btn-text.approve {
-            color: var(--success);
-            border-color: rgba(16,185,129,0.35);
-        }
-        .action-btn-text.approve:hover {
-            background: rgba(16,185,129,0.12);
-            border-color: var(--success);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 12px rgba(16,185,129,0.2);
-        }
-
-        .action-btn-text.reject {
-            color: var(--danger);
-            border-color: rgba(239,68,68,0.35);
-        }
-        .action-btn-text.reject:hover {
-            background: rgba(239,68,68,0.12);
-            border-color: var(--danger);
-            transform: translateY(-1px);
-            box-shadow: 0 3px 12px rgba(239,68,68,0.2);
-        }
-
-        .action-btn-text:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        /* School info cell */
-        .school-cell {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-        .school-cell .school-name {
-            font-size: 13px;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-        .school-cell .school-npsn {
-            font-family: 'Courier New', monospace;
-            background: rgba(16,185,129,0.08);
-            padding: 3px 8px;
-            border-radius: 5px;
-            color: var(--success);
-            font-weight: 600;
-            font-size: 11px;
-            display: inline-block;
-            width: fit-content;
-        }
 
         /* Approve modal password area */
         .password-input-group {
@@ -975,6 +911,101 @@
             font-family: 'Courier New', monospace;
         }
 
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            animation: slideInRight 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+        }
+
+        .toast.success::before { background: var(--success); }
+        .toast.error::before { background: var(--danger); }
+        .toast.warning::before { background: var(--warning); }
+        .toast.info::before { background: var(--info); }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .toast-icon { font-size: 18px; flex-shrink: 0; }
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+        .toast.warning .toast-icon { color: var(--warning); }
+        .toast-message { flex: 1; font-size: 14px; line-height: 1.4; }
+        .toast-close { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 15px; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Script Loading Indicator */
+        #scriptLoadingError {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #scriptLoadingError.show { display: flex; }
+        .error-box {
+            background: #1a1a2e;
+            border: 2px solid var(--danger);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            text-align: center;
+        }
+        .error-box h2 { color: var(--danger); margin-bottom: 15px; }
+        .error-box p { color: var(--text-secondary); margin-bottom: 10px; font-size: 14px; }
+        .error-box pre {
+            background: #0a0f1a;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 15px 0;
+        }
     </style>
 
 </head>
@@ -986,6 +1017,19 @@
             <div class="sa-spinner"></div>
             <div style="font-size:1.1rem;font-weight:600;">Memuat Panel Super Admin...</div>
             <div style="font-size:0.85rem;opacity:0.85;">Mohon tunggu sebentar</div>
+        </div>
+    </div>
+
+    <!-- Script Loading Error -->
+    <div id="scriptLoadingError">
+        <div class="error-box">
+            <i class="fas fa-exclamation-triangle" style="font-size:48px;color:var(--danger);margin-bottom:20px;"></i>
+            <h2>Script Loading Error</h2>
+            <p>Terjadi kesalahan saat memuat JavaScript. Silakan refresh halaman.</p>
+            <pre id="errorDetails">Checking scripts...</pre>
+            <button class="btn btn-primary" onclick="window.location.reload()">
+                <i class="fas fa-refresh"></i> Refresh Halaman
+            </button>
         </div>
     </div>
 
@@ -1113,7 +1157,7 @@
                 </div>
                 <div class="search-box">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="saSearch" placeholder="Cari berdasarkan nama, email, username, atau NPSN..." oninput="filterRequests()">
+                    <input type="text" id="saSearch" placeholder="Cari berdasarkan nama, email, username, atau NPSN..." autocomplete="off">
                 </div>
             </div>
 
@@ -1186,7 +1230,7 @@
         </div>
     </div>
 
-        <!-- Approve Modal (Password Input) -->
+    <!-- Approve Modal (Password Input) -->
     <div class="modal-overlay" id="approveModal" onclick="if(event.target === this) closeApproveModal()">
         <div class="modal" style="max-width:500px;" role="dialog">
             <div class="modal-header" style="justify-content:center;">
@@ -1210,7 +1254,7 @@
                     </label>
                     <div class="password-input-group">
                         <div class="password-input-wrap">
-                            <input type="password" id="approvePassword" placeholder="Min. 6 karakter" required minlength="6">
+                            <input type="password" id="approvePassword" placeholder="Min. 6 karakter" required minlength="6" autocomplete="new-password">
                             <button type="button" class="password-toggle-btn" onclick="toggleApprovePassword()">
                                 <i class="fas fa-eye" id="approveToggleEye"></i>
                             </button>
@@ -1286,15 +1330,94 @@
     <!-- Toast Container -->
     <div id="toastBox" class="toast-container"></div>
 
-    <!-- Di bagian <head> atau sebelum script tags lain -->
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- bcryptjs CDN - TAMBAHKAN INI! -->
-    <script src="https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js"></script>
-    <!-- Lalu baru script admin-super.js -->
-    <script src="/src/js/admin/super-admin.js"></script>
+    <!-- ==========================================
+         SCRIPTS - Loading with Error Handling
+         ========================================== -->
 
-    <!-- Helper Scripts (Non-Module) -->
+    <script>
+        // Script loading tracker
+        window.__scriptStatus = {
+            supabase: 'loading',
+            bcrypt: 'loading',
+            supabaseConfig: 'loading',
+            superAdmin: 'loading',
+            fontAwesome: 'loading'
+        };
+
+        // Track script loading errors
+        window.__scriptErrors = [];
+
+        function logScriptStatus(scriptName, status) {
+            window.__scriptStatus[scriptName] = status;
+            console.log(`[Script] ${scriptName}: ${status}`);
+            
+            if (status === 'error') {
+                window.__scriptErrors.push({ script: scriptName, error: status });
+                checkAllScripts();
+            }
+        }
+
+        function checkAllScripts() {
+            const allScripts = Object.keys(window.__scriptStatus);
+            const errorCount = allScripts.filter(s => window.__scriptStatus[s] === 'error').length;
+            const loadedCount = allScripts.filter(s => window.__scriptStatus[s] === 'loaded').length;
+            
+            if (errorCount > 0 && loadedCount + errorCount === allScripts.length) {
+                showScriptError();
+            }
+        }
+
+        function showScriptError() {
+            const errorBox = document.getElementById('scriptLoadingError');
+            const errorDetails = document.getElementById('errorDetails');
+            
+            if (errorBox && errorDetails) {
+                const details = window.__scriptErrors.map(e => `${e.script}: ${e.error}`).join('\n');
+                errorDetails.textContent = details;
+                errorBox.classList.add('show');
+            }
+        }
+
+        // Safe search input handler
+        function safeFilterRequests() {
+            if (typeof filterRequests === 'function') {
+                filterRequests();
+            } else {
+                console.warn('filterRequests not yet loaded');
+            }
+        }
+
+        // Setup search input with safe handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('saSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', safeFilterRequests);
+            }
+        });
+    </script>
+
+    <!-- 1. Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" 
+            onload="logScriptStatus('supabase', 'loaded')"
+            onerror="logScriptStatus('supabase', 'error')"></script>
+
+    <!-- 2. bcryptjs Library - untuk hashing password -->
+    <script src="https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js" 
+            onload="logScriptStatus('bcrypt', 'loaded')"
+            onerror="logScriptStatus('bcrypt', 'error')"></script>
+
+    <!-- 3. Font Awesome Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" 
+            onload="logScriptStatus('fontAwesome', 'loaded')"
+            onerror="logScriptStatus('fontAwesome', 'error')"></script>
+
+    <!-- 4. Supabase Config - PENTING! type="module" -->
+    <script type="module" src="/src/config/supabase.js"></script>
+
+    <!-- 5. Super Admin Script - Changed to module for proper import -->
+    <script type="module" src="/src/js/admin/super-admin.js"></script>
+
+    <!-- 6. Helper Scripts (Non-Module) -->
     <script>
         function toggleSidebar() {
             document.getElementById('sidebar')?.classList.toggle('open');
@@ -1315,8 +1438,15 @@
 
         async function doLogout() {
             if (!confirm('Yakin ingin keluar?')) return;
-            await (await import('/src/config/supabase.js')).supabase.auth.signOut();
-            localStorage.clear(); sessionStorage.clear();
+            try {
+                // Try to import supabase module
+                const supabaseModule = await import('/src/config/supabase.js');
+                await supabaseModule.supabase.auth.signOut();
+            } catch (e) {
+                console.error('Logout error:', e);
+            }
+            localStorage.clear(); 
+            sessionStorage.clear();
             window.location.replace('/admin/login.html');
         }
         window.doLogout = doLogout;
@@ -1325,9 +1455,42 @@
         new MutationObserver(() => {
             const l = document.getElementById('saLoader');
             if (l && document.documentElement.classList.contains('dash-auth-ready')) {
-                setTimeout(() => { l.style.opacity = '0'; setTimeout(() => l?.remove(), 300); }, 150);
+                setTimeout(() => { 
+                    l.style.opacity = '0'; 
+                    setTimeout(() => l?.remove(), 300); 
+                }, 150);
             }
         }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e);
+            if (e.filename && e.filename.includes('super-admin.js')) {
+                logScriptStatus('superAdmin', 'error');
+            }
+        });
+
+        // Debugging: Cek apakah semua fungsi loaded
+        window.addEventListener('load', function() {
+            console.log('=== Script Loading Check ===');
+            console.log('supabase:', typeof supabase);
+            console.log('bcrypt:', typeof bcrypt);
+            console.log('filterRequests:', typeof filterRequests);
+            console.log('hashPassword:', typeof hashPassword);
+            
+            if (typeof filterRequests === 'undefined') {
+                console.error('❌ filterRequests NOT defined!');
+                logScriptStatus('superAdmin', 'error');
+            }
+            if (typeof bcrypt === 'undefined') {
+                console.error('❌ bcrypt NOT loaded!');
+            }
+            if (typeof supabase === 'undefined') {
+                console.error('❌ supabase NOT loaded!');
+            }
+            
+            checkAllScripts();
+        });
     </script>
 </body>
 </html>
