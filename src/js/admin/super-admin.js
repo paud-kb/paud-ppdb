@@ -115,9 +115,6 @@ function hideLoader() {
     }
 }
 
-// ==========================================
-// LOAD REQUESTS (via API)
-// ==========================================
 async function loadRequests() {
     try {
         saToast('Memuat data pengajuan...', 'info');
@@ -125,8 +122,14 @@ async function loadRequests() {
         // Panggil API instead of direct database access
         const result = await fetchAPI('/api/admin/admin-requests');
 
+        console.log('API Response:', result);
+        console.log('Requests count:', result.requests?.length || 0);
+
         SA.requests = result.requests || [];
         SA.filtered = [...SA.requests];
+
+        console.log('SA.requests:', SA.requests);
+        console.log('SA.filtered:', SA.filtered);
 
         renderTable(SA.filtered);
         updateStats();
@@ -232,7 +235,12 @@ function renderStatusBadge(status) {
 // FILTER / SEARCH
 // ==========================================
 function filterRequests() {
-    const kw = (document.getElementById('saSearch')?.value || '').toLowerCase().trim();
+    const searchInput = document.getElementById('saSearch');
+    const kw = searchInput ? String(searchInput.value || '').toLowerCase().trim() : '';
+    
+    console.log('Filtering with keyword:', kw);
+    console.log('Current SA.requests:', SA.requests);
+    
     if (!kw) {
         SA.filtered = [...SA.requests];
     } else {
@@ -241,6 +249,8 @@ function filterRequests() {
                 .some(f => String(f || '').toLowerCase().includes(kw))
         );
     }
+    
+    console.log('Filtered result:', SA.filtered);
     renderTable(SA.filtered);
 }
 window.filterRequests = filterRequests;
@@ -404,10 +414,13 @@ function generatePassword() {
 }
 window.generatePassword = generatePassword;
 
-// Realtime password strength check
-document.addEventListener('input', (e) => {
-    if (e.target.id === 'approvePassword') {
-        checkPasswordStrength(e.target.value);
+// ✅ Ganti dengan event listener yang lebih spesifik
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('approvePassword');
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function(e) {
+            checkPasswordStrength(e.target.value);
+        });
     }
 });
 
