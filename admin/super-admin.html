@@ -1286,11 +1286,13 @@
     <!-- Toast Container -->
     <div id="toastBox" class="toast-container"></div>
 
-    <!-- Module Script -->
-    <!-- ✅ YANG BENAR -->
-     <!-- bcryptjs CDN -->
+    <!-- Di bagian <head> atau sebelum script tags lain -->
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- bcryptjs CDN - TAMBAHKAN INI! -->
     <script src="https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js"></script>
-    <script type="module" src="/src/js/admin/super-admin.js"></script>
+    <!-- Lalu baru script admin-super.js -->
+    <script src="/src/js/admin/super-admin.js"></script>
 
     <!-- Helper Scripts (Non-Module) -->
     <script>
