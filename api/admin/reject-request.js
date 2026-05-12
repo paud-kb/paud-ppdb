@@ -1,16 +1,20 @@
-// ==========================================
-// API: POST /api/admin/reject-request
-// Fungsi: Menolak admin request dengan alasan
-// Operasi: Update admin_requests status = rejected + rejection_reason
-// Auth: Hanya super_admin
-// ==========================================
-
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
+const supabaseAdmin = createClient({
+  url: supabaseUrl,
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false
+  },
+  global: {
+    headers: {
+      apikey: supabaseServiceRoleKey
+    }
+  }
+});
 
 export default async function handler(req, res) {
     try {
