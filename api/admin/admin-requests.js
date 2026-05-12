@@ -1,141 +1,79 @@
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
-// ==========================================
-// VALIDATE ENVIRONMENT VARIABLES
-// ==========================================
+// Validate environment variables
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-// Log untuk debugging
-console.log('[DEBUG] supabaseUrl type:', typeof supabaseUrl);
-console.log('[DEBUG] supabaseUrl value:', supabaseUrl ? 'SET' : 'NOT SET');
-console.log('[DEBUG] supabaseServiceRoleKey:', supabaseServiceRoleKey ? 'SET' : 'NOT SET');
-
-// Validasi environment variables
-if (!supabaseUrl || typeof supabaseUrl !== 'string') {
-  return async function handler(req, res) {
-    return res.status(500).json({
-      success: false,
-      error: 'VITE_SUPABASE_URL is not configured or invalid',
-      debug: {
-        type: typeof supabaseUrl,
-        value: supabaseUrl
-      }
-    });
-  };
-}
-
-if (!supabaseServiceRoleKey || typeof supabaseServiceRoleKey !== 'string') {
-  return async function handler(req, res) {
-    return res.status(500).json({
-      success: false,
-      error: 'SUPABASE_SERVICE_ROLE_KEY is not configured or invalid',
-      debug: {
-        type: typeof supabaseServiceRoleKey,
-        value: supabaseServiceRoleKey ? 'EXISTS' : 'NOT SET'
-      }
-    });
-  };
-}
-
-// ==========================================
-// CREATE SUPABASE CLIENT
-// ==========================================
-
-console.log('[DEBUG] Creating Supabase client...');
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false
-  }
+console.log('Environment check:', {
+  hasSupabaseUrl: !!supabaseUrl,
+  supabaseUrlType: typeof supabaseUrl,
+  hasSupabaseKey: !!supabaseKey,
+  supabaseKeyType: typeof supabaseKey
 });
 
-console.log('[DEBUG] Supabase client created successfully');
+if (!supabaseUrl || typeof supabaseUrl !== 'string') {
+  throw new Error('SUPABASE_URL environment variable is missing or invalid');
+}
 
-// ==========================================
-// API HANDLER
-// ==========================================
+if (!supabaseKey || typeof supabaseKey !== 'string') {
+  throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is missing or invalid');
+}
 
-export default async function handler(req, res) {
+const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
+
+module.exports = async (req, res) => {
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   try {
-    // Method check
-    if (req.method !== 'GET') {
-      return res.status(405).json({
-        success: false,
-        error: 'Method not allowed. Use GET.'
-      });
-    }
-
-    // Auth check - verify super_admin
+    // Verify user is authenticated and is super admin
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        error: 'Missing authorization header'
-      });
+      return res.status(401).json({ error: 'Unauthorized - No token provided' });
     }
 
-    const token = authHeader.replace('Bearer ', '');
-
-    // Verify token
+    const token = authHeader.substring(7);
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
     if (authError || !user) {
-      return res.status(401).json({
-        success: false,
-        error: 'Invalid or expired token'
-      });
+      return res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
 
-    // Check user role
-    const { data: userData, error: userError } = await supabaseAdmin
-      .from('users')
-      .select('role, is_active')
+    // Check if user is super admin
+    const { data: adminData, error: adminError } = await supabaseAdmin
+      .from('admins')
+      .select('role')
       .eq('id', user.id)
-      .maybeSingle();
+      .single();
 
-    if (userError) {
-      return res.status(500).json({
-        success: false,
-        error: 'Failed to verify user: ' + userError.message
-      });
+    if (adminError || !adminData || adminData.role !== 'super_admin') {
+      return res.status(403).json({ error: 'Forbidden - Not a super admin' });
     }
 
-    if (!userData || userData.role !== 'super_admin') {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied. Only super_admin can access this endpoint.'
-      });
+    if (req.method === 'GET') {
+      // Get all admin requests
+      const { data, error } = await supabaseAdmin
+        .from('admin_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching admin requests:', error);
+        return res.status(500).json({ error: 'Failed to fetch admin requests' });
+      }
+
+      return res.status(200).json({ requests: data });
+    } else {
+      return res.status(405).json({ error: 'Method not allowed' });
     }
-
-    if (!userData.is_active) {
-      return res.status(403).json({
-        success: false,
-        error: 'Account is inactive.'
-      });
-    }
-
-    // Fetch all admin_requests
-    const { data, error } = await supabaseAdmin
-      .from('admin_requests')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      throw error;
-    }
-
-    return res.status(200).json({
-      success: true,
-      data: data || []
-    });
-
-  } catch (err) {
-    console.error('[API] admin-requests error:', err);
-    return res.status(500).json({
-      success: false,
-      error: err.message || 'Internal server error'
-    });
+  } catch (error) {
+    console.error('Error in admin-requests API:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
-}
+};
