@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Verify user is authenticated and is super admin
+    // Verify user is authenticated
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized - No token provided' });
@@ -37,9 +37,9 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
 
-    // Check if user is super admin
+    // Check if user is super admin from public.users table
     const { data: adminData, error: adminError } = await supabaseAdmin
-      .from('admins')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single();
@@ -48,13 +48,19 @@ module.exports = async (req, res) => {
       return res.status(403).json({ error: 'Forbidden - Not a super admin' });
     }
 
-    const { requestId } = req.body;
+    const { requestId, passwordHash } = req.body;
 
     if (!requestId) {
       return res.status(400).json({ error: 'requestId is required' });
     }
 
-    // Get the request details
+    if (!passwordHash || passwordHash.trim() === '') {
+      return res.status(400).json({ error: 'passwordHash is required' });
+    }
+
+    console.log('Processing approval for request:', requestId);
+
+    // Get request details
     const { data: requestData, error: requestError } = await supabaseAdmin
       .from('admin_requests')
       .select('*')
@@ -62,6 +68,7 @@ module.exports = async (req, res) => {
       .single();
 
     if (requestError || !requestData) {
+      console.error('Request not found:', requestError);
       return res.status(404).json({ error: 'Request not found' });
     }
 
@@ -69,47 +76,75 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Request has already been processed' });
     }
 
-    // Create admin user in Supabase Auth
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: requestData.email,
-      password: generatePassword(12),
-      email_confirm: true,
-      user_metadata: {
-        nama_lengkap: requestData.nama_lengkap,
-        npsn: requestData.npsn,
-        no_hp: requestData.no_hp,
-        role: 'admin'
-      }
-    });
+    // Check if username already exists in users table
+    const { data: existingUser } = await supabaseAdmin
+      .from('users')
+      .select('id, username')
+      .eq('username', requestData.username_desired)
+      .single();
 
-    if (authError) {
-      console.error('Error creating auth user:', authError);
-      return res.status(500).json({ error: 'Failed to create admin user' });
+    if (existingUser) {
+      return res.status(400).json({ 
+        error: 'Username already exists',
+        username: existingUser.username 
+      });
     }
 
-    // Create admin record in admins table
-    const { error: adminInsertError } = await supabaseAdmin
-      .from('admins')
+    // Insert into public.users table with provided password hash (ALREADY HASHED FROM FRONTEND)
+    const { error: userInsertError } = await supabaseAdmin
+      .from('users')
       .insert({
-        id: authData.user.id,
-        email: requestData.email,
-        nama_lengkap: requestData.nama_lengkap,
-        npsn: requestData.npsn,
-        no_hp: requestData.no_hp,
         username: requestData.username_desired,
+        password_hash: passwordHash, // Password sudah di-hash dari frontend
+        full_name: requestData.nama_lengkap,
+        email: requestData.email,
+        no_hp: requestData.no_hp,
         role: 'admin',
+        npsn: requestData.npsn,
+        is_active: true,
+        is_verified: false,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
+        created_by: user.id
       });
 
-    if (adminInsertError) {
-      console.error('Error creating admin record:', adminInsertError);
-      // Rollback: delete the auth user
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
-      return res.status(500).json({ error: 'Failed to create admin record' });
+    if (userInsertError) {
+      console.error('Error creating user record:', userInsertError);
+      return res.status(500).json({ 
+        error: 'Failed to create user record',
+        details: userInsertError.message 
+      });
     }
 
-    // Update the admin_requests status
+    console.log('User created successfully');
+
+    // Check if school exists
+    const { data: schoolData } = await supabaseAdmin
+      .from('schools')
+      .select('npsn')
+      .eq('npsn', requestData.npsn)
+      .single();
+
+    if (!schoolData) {
+      // Create school record with same password hash
+      const { error: schoolInsertError } = await supabaseAdmin
+        .from('schools')
+        .insert({
+          npsn: requestData.npsn,
+          nama_sekolah: requestData.nama_sekolah,
+          password_hash: passwordHash, // Password sudah di-hash dari frontend
+          is_active: true,
+          created_at: new Date().toISOString()
+        });
+
+      if (schoolInsertError) {
+        console.error('Error creating school record:', schoolInsertError);
+      } else {
+        console.log('School created successfully');
+      }
+    }
+
+    // Update admin_requests status to approved
     const { error: updateError } = await supabaseAdmin
       .from('admin_requests')
       .update({
@@ -125,22 +160,18 @@ module.exports = async (req, res) => {
       return res.status(500).json({ error: 'Failed to update request status' });
     }
 
+    console.log('Request approved successfully');
+
     return res.status(200).json({ 
       success: true, 
       message: 'Admin approved successfully',
-      adminId: authData.user.id
+      username: requestData.username_desired,
+      email: requestData.email,
+      npsn: requestData.npsn
+      // Tidak mengembalikan defaultPassword karena password sudah diinput di frontend
     });
   } catch (error) {
     console.error('Error in approve-request API:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
-
-function generatePassword(length) {
-  const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
-  }
-  return password;
-}

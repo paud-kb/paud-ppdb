@@ -10,7 +10,6 @@ if (!supabaseUrl || !supabaseKey) {
 const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
-  // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -24,7 +23,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Verify user is authenticated and is super admin
+    // Verify user is authenticated
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized - No token provided' });
@@ -37,9 +36,9 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized - Invalid token' });
     }
 
-    // Check if user is super admin
+    // Check if user is super admin from public.users table
     const { data: adminData, error: adminError } = await supabaseAdmin
-      .from('admins')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single();
@@ -77,6 +76,7 @@ module.exports = async (req, res) => {
     const { error: updateError } = await supabaseAdmin
       .from('admin_requests')
       .update({
+        id: requestId,
         status: 'rejected',
         rejection_reason: reason,
         reviewed_by: user.id,

@@ -35,8 +35,9 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    // Check if user is super admin from public.users table
     const { data: adminData, error: adminError } = await supabaseAdmin
-      .from('admins')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single();

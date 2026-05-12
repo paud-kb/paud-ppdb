@@ -1,10 +1,11 @@
 // ==========================================
-// SUPER-ADMIN.JS v6.0 - SECURE WITH API ROUTES
+// SUPER-ADMIN.JS v6.1 - SECURE WITH API ROUTES + BCRYPT
 // ==========================================
 // PERUBAHAN UTAMA:
 // - Service role key TIDAK ADA di frontend
 // - Semua operasi admin lewat API routes (server-side)
 // - Frontend hanya menggunakan anon key untuk auth session
+// - Password di-hash dengan bcrypt di frontend sebelum dikirim ke API
 
 import { supabase } from '/src/config/supabase.js';
 
@@ -124,7 +125,7 @@ async function loadRequests() {
         // Panggil API instead of direct database access
         const result = await fetchAPI('/api/admin/admin-requests');
 
-        SA.requests = result.data || [];
+        SA.requests = result.requests || [];
         SA.filtered = [...SA.requests];
 
         renderTable(SA.filtered);
@@ -312,6 +313,31 @@ function viewDetail(id) {
 window.viewDetail = viewDetail;
 
 // ==========================================
+// BCRYPT PASSWORD HASHING
+// ==========================================
+
+/**
+ * Hash password menggunakan bcrypt
+ * @param {string} password - Plain password
+ * @returns {Promise<string>} - Hashed password
+ */
+async function hashPassword(password) {
+    try {
+        // bcrypt tersedia dari CDN di HTML
+        if (typeof bcrypt === 'undefined') {
+            throw new Error('bcrypt library not loaded. Please check HTML script tag.');
+        }
+        
+        const saltRounds = 10;
+        const hash = await bcrypt.hash(password, saltRounds);
+        return hash;
+    } catch (error) {
+        console.error('Error hashing password:', error);
+        throw new Error('Gagal meng-hash password: ' + error.message);
+    }
+}
+
+// ==========================================
 // APPROVE - OPEN MODAL
 // ==========================================
 function openApproveModal(id) {
@@ -439,12 +465,17 @@ async function executeApprove() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-        // Panggil API approve-request
+        // Hash password dengan bcrypt
+        saToast('Meng-hash password...', 'info');
+        const passwordHash = await hashPassword(password);
+        console.log('Password hashed successfully');
+
+        // Panggil API approve-request dengan password hash
         const result = await fetchAPI('/api/admin/approve-request', {
             method: 'POST',
             body: JSON.stringify({
                 requestId: id,
-                plainPassword: password
+                passwordHash: passwordHash  // Kirim password yang sudah di-hash
             })
         });
 
@@ -452,8 +483,8 @@ async function executeApprove() {
             throw new Error(result.error || 'Gagal menyetujui request');
         }
 
-        // Tampilkan password result
-        showPasswordResult(request, result.data.plainPassword);
+        // Tampilkan password result (gunakan password dari input, bukan dari backend)
+        showPasswordResult(request, password);
 
         // Reload data
         await loadRequests();
@@ -554,7 +585,7 @@ async function executeReject() {
             method: 'POST',
             body: JSON.stringify({
                 requestId: id,
-                rejectionReason: reason
+                reason: reason
             })
         });
 
@@ -562,7 +593,7 @@ async function executeReject() {
             throw new Error(result.error || 'Gagal menolak request');
         }
 
-        saToast(result.data.message || `"${name}" ditolak`, 'warning');
+        saToast(result.message || `"${name}" ditolak`, 'warning');
         closeRejectModal();
         await loadRequests();
 

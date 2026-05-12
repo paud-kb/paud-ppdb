@@ -35,8 +35,9 @@ module.exports = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    // Check if user is super admin from public.users table
     const { data: adminData, error: adminError } = await supabaseAdmin
-      .from('admins')
+      .from('users')
       .select('role')
       .eq('id', user.id)
       .single();
@@ -45,7 +46,11 @@ module.exports = async (req, res) => {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers();
+    // Get all users from public.users
+    const { data: users, error } = await supabaseAdmin
+      .from('users')
+      .select('*')
+      .order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching users:', error);
