@@ -333,13 +333,15 @@ window.viewDetail = viewDetail;
  */
 async function hashPassword(password) {
     try {
-        // bcrypt tersedia dari CDN di HTML
-        if (typeof bcrypt === 'undefined') {
-            throw new Error('bcrypt library not loaded. Please check HTML script tag.');
+        // Pastikan bcrypt ada di window global
+        const bcryptLib = window.bcrypt || window.dcodeIO?.bcrypt;
+        
+        if (typeof bcryptLib === 'undefined') {
+            throw new Error('Library bcrypt tidak ditemukan. Pastikan script bcrypt dimuat.');
         }
         
         const saltRounds = 10;
-        const hash = await bcrypt.hash(password, saltRounds);
+        const hash = await bcryptLib.hash(password, saltRounds);
         return hash;
     } catch (error) {
         console.error('Error hashing password:', error);
@@ -360,7 +362,8 @@ function openApproveModal(id) {
     document.getElementById('approveTargetInfo').textContent = `${r.email} • ${esc(r.nama_sekolah || '')} • NPSN: ${r.npsn}`;
     document.getElementById('approvePassword').value = '';
     document.getElementById('approvePassword').type = 'password';
-    document.getElementById('approveToggleEye').className = 'fas fa-eye';
+    document.getElementById('approveToggleEye').classList.remove('fa-eye-slash');
+    document.getElementById('approveToggleEye').classList.add('fa-eye');
     document.getElementById('approvePasswordStrength').innerHTML = '';
 
     const btn = document.getElementById('confirmApproveBtn');
@@ -376,15 +379,20 @@ window.openApproveModal = openApproveModal;
 // ==========================================
 // APPROVE - PASSWORD HELPERS
 // ==========================================
+// ✅ BENAR - pakai classList untuk SVG
 function toggleApprovePassword() {
     const input = document.getElementById('approvePassword');
     const eye = document.getElementById('approveToggleEye');
     if (input.type === 'password') {
         input.type = 'text';
-        eye.className = 'fas fa-eye-slash';
+        // Hapus semua classes, tambah class baru
+        eye.classList.remove('fa-eye');
+        eye.classList.add('fa-eye-slash');
     } else {
         input.type = 'password';
-        eye.className = 'fas fa-eye';
+        // Hapus semua classes, tambah class baru
+        eye.classList.remove('fa-eye-slash');
+        eye.classList.add('fa-eye');
     }
 }
 window.toggleApprovePassword = toggleApprovePassword;
@@ -409,7 +417,8 @@ function generatePassword() {
     const input = document.getElementById('approvePassword');
     input.value = pass;
     input.type = 'text';
-    document.getElementById('approveToggleEye').className = 'fas fa-eye-slash';
+    document.getElementById('approveToggleEye').classList.remove('fa-eye');
+    document.getElementById('approveToggleEye').classList.add('fa-eye-slash');
     checkPasswordStrength(pass);
 }
 window.generatePassword = generatePassword;

@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Font Awesome -->
+    <!-- Font Awesome (CSS ONLY - JS Version dihapus untuk mencegah error SVG className) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Auth Guard Styles -->
@@ -1406,10 +1406,8 @@
             onload="logScriptStatus('bcrypt', 'loaded')"
             onerror="logScriptStatus('bcrypt', 'error')"></script>
 
-    <!-- 3. Font Awesome Icons -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" 
-            onload="logScriptStatus('fontAwesome', 'loaded')"
-            onerror="logScriptStatus('fontAwesome', 'error')"></script>
+    <!-- PERBAIKAN: Font Awesome JS dihapus untuk mencegah error SVG className -->
+    <!-- 3. Font Awesome Icons (Versi JS dihapus, gunakan CSS saja yang sudah ada di head) -->
 
     <!-- 4. Supabase Config - PENTING! type="module" -->
     <script type="module" src="/src/config/supabase.js"></script>
@@ -1484,6 +1482,8 @@
             }
             if (typeof bcrypt === 'undefined') {
                 console.error('❌ bcrypt NOT loaded!');
+                // Fallback visual warning if library fails to load
+                saToast('Library Bcrypt gagal dimuat. Fitur approval mungkin tidak berjalan.', 'error');
             }
             if (typeof supabase === 'undefined') {
                 console.error('❌ supabase NOT loaded!');
