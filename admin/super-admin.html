@@ -1396,19 +1396,27 @@
         });
     </script>
 
-    <!-- 1. Supabase Client Library -->
+        <!-- 1. Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" 
             onload="logScriptStatus('supabase', 'loaded')"
             onerror="logScriptStatus('supabase', 'error')"></script>
 
-    <!-- 2. bcryptjs Library - untuk hashing password -->
-    <script src="https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js" 
-            onload="logScriptStatus('bcrypt', 'loaded')"
-            onerror="logScriptStatus('bcrypt', 'error')"></script>
+    <!-- 2. bcryptjs Library -->
+    <script src="https://cdn.jsdelivr.net/npm/bcryptjs/dist/bcrypt.min.js"></script>
 
-    <!-- PERBAIKAN: Font Awesome JS dihapus untuk mencegah error SVG className -->
-    <!-- 3. Font Awesome Icons (Versi JS dihapus, gunakan CSS saja yang sudah ada di head) -->
-
+    <!-- 2b. Wajib: Aliasing bcrypt ke window global AGAR JS bisa membaca -->
+    <script>
+        // Pastikan script ini langsung jalan setelah bcrypt dimuat
+        if (window.dcodeIO && window.dcodeIO.bcrypt) {
+            window.bcrypt = window.dcodeIO.bcrypt;
+            console.log('✅ bcrypt loaded successfully via window.bcrypt');
+            logScriptStatus('bcrypt', 'loaded');
+        } else {
+            console.error('❌ bcrypt FAILED to load properly.');
+            logScriptStatus('bcrypt', 'error');
+        }
+    </script>
+    
     <!-- 4. Supabase Config - PENTING! type="module" -->
     <script type="module" src="/src/config/supabase.js"></script>
 
