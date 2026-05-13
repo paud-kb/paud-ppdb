@@ -1,7 +1,7 @@
 {
   "id": "ppdb-paud-banjar-2026",
 
-  "name": "PPDB PAUD Banjar 2026/2027",
+  "name": "PPDB kota Banjar 2026/2027",
   "short_name": "PPDB PAUD",
 
   "description": "Sistem Penerimaan Peserta Didik Baru PAUD Kabupaten/Kota Banjar Tahun Ajaran 2026/2027",
@@ -49,7 +49,7 @@
     "sizes": "512x512",
     "type": "image/png",
     "form_factor": "wide",
-    "label": "PPDB PAUD Banjar"
+    "label": "PPDB kota Banjar"
   }
 ],
 

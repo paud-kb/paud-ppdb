@@ -1,16 +1,18 @@
 /**
  * =====================================================
- *  SERVICE WORKER - PPDB PAUD Banjar
- *  Version: 1.0.0
- *  
+ *  SERVICE WORKER - PPDB Kota Banjar
+ *  Version: 1.0.1
+ *
  *  Features:
  *  - Cache-first strategy for static assets
- *  - Network-first strategy for API calls
+ *  - Network-first strategy for HTML pages
  *  - Offline fallback page
- *  - Background sync support
+ *  - Safe handling for Supabase API
+ *  - Background sync ready
  * =====================================================
+ */
 
-const CACHE_NAME = 'ppdb-paud-v1.0.0';
+const CACHE_NAME = 'ppdb-paud-v1.0.1';
 const OFFLINE_URL = '/offline.html';
 
 // ==========================================
@@ -20,17 +22,25 @@ const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/ppdb.html',
+  '/registrasi.html',
+  '/offline.html',
+
   '/admin/login.html',
   '/admin/dashboard.html',
+  '/admin/super-admin.html',
+
   '/css/style.css',
+
   '/js/config.js',
   '/js/app.js',
   '/js/ppdb.js',
   '/js/login.js',
   '/js/dashboard.js',
   '/js/super-admin.js',
+
   '/manifest.json',
-  // Fonts from CDN
+
+  // External fonts / icons
   'https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
 ];
@@ -39,16 +49,14 @@ const PRECACHE_ASSETS = [
 // INSTALL EVENT
 // ==========================================
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker...');
-  
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Precaching app shell');
-        return cache.addAll(PRECACHE_ASSETS);
-      })
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_ASSETS))
       .then(() => self.skipWaiting())
-      .catch((err) => console.error('[SW] Precache failed:', err))
+      .catch(() => {
+        // Silent fail to avoid exposing internal details
+      })
   );
 });
 
@@ -56,18 +64,18 @@ self.addEventListener('install', (event) => {
 // ACTIVATE EVENT
 // ==========================================
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker...');
-  
   event.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
-            .filter((name) => name.startsWith('ppdb-paud-') && name !== CACHE_NAME)
-            .map((name) => {
-              console.log('[SW] Deleting old cache:', name);
-              return caches.delete(name);
-            })
+            .filter(
+              (name) =>
+                name.startsWith('ppdb-paud-') &&
+                name !== CACHE_NAME
+            )
+            .map((name) => caches.delete(name))
         );
       })
       .then(() => self.clients.claim())
@@ -75,227 +83,294 @@ self.addEventListener('activate', (event) => {
 });
 
 // ==========================================
-// FETCH EVENT - Caching Strategy
+// FETCH EVENT
 // ==========================================
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
 
-  // Skip non-GET requests
+  // Only GET requests
   if (request.method !== 'GET') return;
 
-  // Skip chrome-extension and other non-http
+  const url = new URL(request.url);
+
+  // Skip unsupported protocols
   if (!url.protocol.startsWith('http')) return;
 
-  // Strategy 1: Cache First for static assets (CSS, JS, Images, Fonts)
+  /**
+   * ==========================================
+   * IMPORTANT:
+   * Never intercept Supabase requests
+   * ==========================================
+   *
+   * This prevents:
+   * - Failed inserts on mobile PWA
+   * - Cached API responses
+   * - Fake success responses
+   * - Auth/session corruption
+   */
+  if (url.hostname.includes('supabase.co')) {
+    return;
+  }
+
+  // Static assets → Cache First
   if (isStaticAsset(url)) {
     event.respondWith(cacheFirst(request));
     return;
   }
 
-  // Strategy 2: Network First for Supabase API calls
-  if (isApiCall(url)) {
-    event.respondWith(networkFirst(request));
-    return;
-  }
-
-  // Strategy 3: Stale While Revalidate for HTML pages
+  // HTML pages → Stale While Revalidate
   if (isHtmlPage(url)) {
     event.respondWith(staleWhileRevalidate(request));
     return;
   }
 
-  // Default: Network with cache fallback
+  // Default → Network First
   event.respondWith(networkFirst(request));
 });
 
 // ==========================================
-// CACHING STRATEGIES
+// CACHE STRATEGIES
 // ==========================================
 
 /**
- * Cache First: Serve from cache, fallback to network
- * Best for: Static assets that rarely change
+ * Cache First
+ * Best for static assets
  */
 async function cacheFirst(request) {
   const cachedResponse = await caches.match(request);
-  
+
   if (cachedResponse) {
-    // Update cache in background
     fetchAndCache(request);
     return cachedResponse;
   }
 
   try {
     const networkResponse = await fetch(request);
-    
-    if (networkResponse.ok) {
+
+    if (networkResponse && networkResponse.ok) {
       const cache = await caches.open(CACHE_NAME);
+
       cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch (error) {
-    // Return offline fallback for navigation requests
     if (request.mode === 'navigate') {
-      return caches.match(OFFLINE_URL) || new Response('Offline', { status: 503 });
+      const offlineResponse = await caches.match(OFFLINE_URL);
+
+      return (
+        offlineResponse ||
+        new Response('Offline', {
+          status: 503,
+          headers: {
+            'Content-Type': 'text/plain'
+          }
+        })
+      );
     }
-    
+
     throw error;
   }
 }
 
 /**
- * Network First: Try network, fallback to cache
- * Best for: API calls that need fresh data
+ * Network First
+ * Best for dynamic content
  */
 async function networkFirst(request) {
   try {
     const networkResponse = await fetch(request);
-    
-    if (networkResponse.ok) {
+
+    if (networkResponse && networkResponse.ok) {
       const cache = await caches.open(CACHE_NAME);
+
       cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
   } catch (error) {
     const cachedResponse = await caches.match(request);
-    
+
     if (cachedResponse) {
       return cachedResponse;
     }
-    
-    // Return offline data placeholder for API calls
-    if (request.url.includes('supabase.co')) {
-      return new Response(JSON.stringify({ 
-        error: 'Anda sedang offline. Data mungkin tidak terbaru.' 
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
+
+    if (request.mode === 'navigate') {
+      const offlineResponse = await caches.match(OFFLINE_URL);
+
+      if (offlineResponse) {
+        return offlineResponse;
+      }
     }
-    
-    throw error;
+
+    return new Response('Network Error', {
+      status: 503,
+      headers: {
+        'Content-Type': 'text/plain'
+      }
+    });
   }
 }
 
 /**
- * Stale While Revalidate: Serve cache immediately, update in background
- * Best for: HTML pages - instant load + always fresh
+ * Stale While Revalidate
+ * Best for HTML pages
  */
 async function staleWhileRevalidate(request) {
   const cache = await caches.open(CACHE_NAME);
+
   const cachedResponse = await cache.match(request);
 
   const fetchPromise = fetch(request)
     .then((networkResponse) => {
-      if (networkResponse.ok) {
+      if (networkResponse && networkResponse.ok) {
         cache.put(request, networkResponse.clone());
       }
+
       return networkResponse;
     })
-    .catch(() => cachedResponse); // Fallback to cache
+    .catch(() => cachedResponse);
 
   return cachedResponse || fetchPromise;
 }
 
 /**
- * Background update cache (doesn't affect response)
+ * Background cache update
  */
 async function fetchAndCache(request) {
   try {
     const response = await fetch(request);
-    if (response.ok) {
+
+    if (response && response.ok) {
       const cache = await caches.open(CACHE_NAME);
-      cache.put(request, response);
+
+      cache.put(request, response.clone());
     }
-  } catch (e) {
-    // Silent fail - user already got cached version
+  } catch (error) {
+    // Silent fail
   }
 }
 
 // ==========================================
-// HELPER FUNCTIONS
+// HELPERS
 // ==========================================
 
 function isStaticAsset(url) {
   const staticExtensions = [
-    '.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp',
-    '.ico', '.woff', '.woff2', '.ttf', '.otf', '.eot'
+    '.css',
+    '.js',
+    '.png',
+    '.jpg',
+    '.jpeg',
+    '.gif',
+    '.svg',
+    '.webp',
+    '.ico',
+    '.woff',
+    '.woff2',
+    '.ttf',
+    '.otf',
+    '.eot'
   ];
-  
+
   const path = url.pathname.toLowerCase();
-  
-  // Check extension
-  if (staticExtensions.some(ext => path.endsWith(ext))) return true;
-  
-  // Check CDN domains
+
+  // File extensions
+  if (staticExtensions.some((ext) => path.endsWith(ext))) {
+    return true;
+  }
+
+  // CDN assets
   if (url.hostname.includes('fonts.googleapis.com')) return true;
   if (url.hostname.includes('fonts.gstatic.com')) return true;
   if (url.hostname.includes('cdnjs.cloudflare.com')) return true;
-  
-  return false;
-}
 
-function isApiCall(url) {
-  return url.pathname.includes('/rest/v1/') || 
-         url.hostname.includes('supabase.co') ||
-         url.searchParams.has('apikey');
+  return false;
 }
 
 function isHtmlPage(url) {
   const path = url.pathname;
-  return path.endsWith('.html') || path === '/' || path.endsWith('/');
+
+  return (
+    path.endsWith('.html') ||
+    path === '/' ||
+    path.endsWith('/')
+  );
 }
 
 // ==========================================
-// PUSH NOTIFICATION SUPPORT (Future)
+// PUSH NOTIFICATION SUPPORT
 // ==========================================
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
-  const data = event.data.json();
-  
+  let data = {};
+
+  try {
+    data = event.data.json();
+  } catch {
+    return;
+  }
+
   const options = {
     body: data.body || 'Notifikasi baru dari PPDB PAUD',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-96.png',
+    icon: '/icon192x192.png',
+    badge: '/icon192x192.png',
     vibrate: [100, 50, 100],
-    data: { url: data.url || '/' },
+    data: {
+      url: data.url || '/'
+    },
     actions: [
-      { action: 'open', title: 'Buka' },
-      { action: 'dismiss', title: 'Tutup' }
+      {
+        action: 'open',
+        title: 'Buka'
+      },
+      {
+        action: 'dismiss',
+        title: 'Tutup'
+      }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'PPDB PAUD Banjar', options)
+    self.registration.showNotification(
+      data.title || 'PPDB Kota Banjar',
+      options
+    )
   );
 });
 
+// ==========================================
+// NOTIFICATION CLICK
+// ==========================================
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   if (event.action === 'open') {
-    const urlToOpen = event.notification.data?.url || '/';
+    const urlToOpen =
+      event.notification.data?.url || '/';
+
     event.waitUntil(clients.openWindow(urlToOpen));
   }
 });
 
 // ==========================================
-// MESSAGE HANDLER (from main thread)
+// MESSAGE HANDLER
 // ==========================================
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
+  if (!event.data) return;
+
+  if (event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-  
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
+
+  if (event.data.type === 'CLEAR_CACHE') {
     caches.delete(CACHE_NAME).then(() => {
-      event.source.postMessage({ type: 'CACHE_CLEARED' });
+      if (event.source) {
+        event.source.postMessage({
+          type: 'CACHE_CLEARED'
+        });
+      }
     });
   }
 });
-
-console.log('[SW] Service Worker loaded successfully!');

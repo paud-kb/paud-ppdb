@@ -6,7 +6,6 @@ import { supabase } from '../config/supabase.js';
 
 let selectedSchool = null;
 let schoolsData = [];
-let inactivityTimer = null; // Timer global untuk reset 10 detik
 
 // ==========================================
 // DOM ELEMENTS
@@ -18,19 +17,15 @@ const menuOverlay = document.getElementById('menuOverlay');
 const schoolGrid = document.getElementById('schoolGrid');
 const schoolGridLoading = document.getElementById('schoolGridLoading');
 
-// Elemen untuk Custom Search (Baru)
+const schoolSelect = document.getElementById('schoolSelect');
 const schoolSearchInput = document.getElementById('schoolSearchInput');
-const schoolDropdownList = document.getElementById('schoolDropdownList');
-const btnCariSekolah = document.getElementById('btnCariSekolah');
-const btnLihatSemua = document.getElementById('btnLihatSemua');
 
-// Elemen lama (dianggap sudah dihapus/replaced di HTML, tapi dijaga referensinya agar tidak error)
-const schoolSelect = document.getElementById('schoolSelect'); 
 const emptyState = document.getElementById('emptyState');
 const errorState = document.getElementById('errorState');
 
 const nextBtn = document.getElementById('nextBtn');
 const nextButtonContainer = document.getElementById('nextButtonContainer');
+
 const mainHeader = document.getElementById('mainHeader');
 
 // ==========================================
@@ -41,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   initHamburgerMenu();
   initHeaderScroll();
-  // initSchoolSearch dipanggil di dalam loadSchools setelah data siap
-  loadSchools(); 
+  initSchoolSearch();
+  loadSchools();
 });
 
 // ==========================================
@@ -134,19 +129,14 @@ async function loadSchools() {
 
     // EMPTY
     if (!data || data.length === 0) {
+
       emptyState.style.display = 'block';
       return;
     }
 
     schoolsData = data;
 
-    // TAMPILKAN GRID KOTAK PENCARIAN
-    if (schoolGrid) {
-      schoolGrid.style.display = 'block';
-    }
-
-    // INISIALISASI PENCARIAN CUSTOM
-    initSchoolSearch();
+    renderSchoolDropdown(data);
 
   } catch (error) {
 
@@ -162,96 +152,87 @@ async function loadSchools() {
 }
 
 // ==========================================
-// INIT CUSTOM SEARCH SCHOOL (LOGIKA BARU)
+// RENDER SCHOOL DROPDOWN
+// ==========================================
+function renderSchoolDropdown(schools) {
+
+  if (!schoolSelect) return;
+
+  // RESET
+  schoolSelect.innerHTML = `
+    <option value="">
+      -- Pilih Sekolah Tujuan --
+    </option>
+  `;
+
+  schools.forEach((school) => {
+
+    const option = document.createElement('option');
+
+    option.value = school.npsn;
+
+    option.textContent =
+      `${school.nama_sekolah} - NPSN: ${school.npsn}`;
+
+    option.dataset.school = JSON.stringify(school);
+
+    schoolSelect.appendChild(option);
+  });
+
+  schoolGrid.style.display = 'block';
+}
+
+// ==========================================
+// SEARCH SCHOOL
 // ==========================================
 function initSchoolSearch() {
-  // Pastikan elemen ada di HTML
-  if (!schoolSearchInput || !schoolDropdownList || !btnCariSekolah || !btnLihatSemua) return;
 
-  // Fungsi Reset Timer 10 Detik
-  const resetTimer = () => {
-    clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-      console.log('[Timer] Reset input (10 detik)');
-      schoolSearchInput.value = '';
-      schoolDropdownList.style.display = 'none';
-      schoolDropdownList.innerHTML = '';
-      if (selectedSchool) showToast('Waktu pencarian habis', 'info');
-    }, 10000);
-  };
+  if (!schoolSearchInput || !schoolSelect) return;
 
-  // Fungsi Filter & Render List
-  const filterSchools = (keyword) => {
-    schoolDropdownList.innerHTML = ''; 
+  schoolSearchInput.addEventListener('input', function () {
 
-    // Jika kosong, tampilkan SEMUA data (bukan sembunyikan)
-    const keywordLower = keyword.toLowerCase();
-    
-    const filtered = schoolsData.filter(school => {
-      return (school.nama_sekolah || '').toLowerCase().includes(keywordLower) ||
-             (school.npsn || '').includes(keywordLower);
+    const keyword = this.value.toLowerCase().trim();
+
+    const filteredSchools = schoolsData.filter((school) => {
+
+      const nama = (school.nama_sekolah || '').toLowerCase();
+      const npsn = (school.npsn || '').toLowerCase();
+
+      return (
+        nama.includes(keyword) ||
+        npsn.includes(keyword)
+      );
     });
 
-    if (filtered.length === 0) {
-      const li = document.createElement('li');
-      li.innerHTML = `<span>Tidak ditemukan sekolah dengan kata "${keyword}"</span>`;
-      li.style.cursor = 'default';
-      schoolDropdownList.appendChild(li);
-    } else {
-      filtered.forEach(school => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <strong>${school.nama_sekolah}</strong>
-          <span>NPSN: ${school.npsn}</span>
-        `;
-        
-        li.addEventListener('click', () => {
-          schoolSearchInput.value = school.nama_sekolah;
-          schoolDropdownList.style.display = 'none';
-          selectSchool(school);
-          clearTimeout(inactivityTimer); // Stop timer jika user memilih
-        });
+    renderSchoolDropdown(filteredSchools);
+  });
 
-        schoolDropdownList.appendChild(li);
-      });
+  // SELECT CHANGE
+  schoolSelect.addEventListener('change', function () {
+
+    const selectedOption =
+      this.options[this.selectedIndex];
+
+    if (!selectedOption.value) {
+
+      selectedSchool = null;
+
+      nextBtn.disabled = true;
+
+      nextBtn.innerHTML = `
+        <span>Pilih Sekolah Terlebih Dahulu</span>
+        <i class="fas fa-arrow-right"></i>
+      `;
+
+      nextButtonContainer.style.display = 'none';
+
+      return;
     }
 
-    schoolDropdownList.style.display = 'block';
-  };
+    const school =
+      JSON.parse(selectedOption.dataset.school);
 
-  // EVENT 1: Mengetik di Input
-  schoolSearchInput.addEventListener('input', (e) => {
-    resetTimer();
-    filterSchools(e.target.value);
-  });
-
-  // EVENT 2: Tombol Lihat Daftar
-  btnLihatSemua.addEventListener('click', () => {
-    schoolSearchInput.value = '';
-    schoolSearchInput.focus();
-    filterSchools(''); // Tampilkan semua
-    resetTimer();
-  });
-
-  // EVENT 3: Tombol Cari
-  btnCariSekolah.addEventListener('click', () => {
-    resetTimer();
-    filterSchools(schoolSearchInput.value.trim());
-    schoolSearchInput.focus();
-  });
-
-  // EVENT 4: Klik di luar area dropdown
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.custom-search-container')) {
-      schoolDropdownList.style.display = 'none';
-    }
-  });
-  
-  // EVENT 5: Focus pada input (Munculkan list jika ada isi)
-  schoolSearchInput.addEventListener('focus', () => {
-    if (schoolSearchInput.value.trim()) {
-      schoolDropdownList.style.display = 'block';
-    }
+    selectSchool(school);
   });
 }
 
@@ -293,7 +274,7 @@ function selectSchool(school) {
 }
 
 // ==========================================
-// GO TO REGISTRATION PAGE (PERBAIKAN BUG NAVIGASI)
+// GO TO REGISTRATION PAGE
 // ==========================================
 window.goToRegistration = function () {
 
@@ -307,13 +288,6 @@ window.goToRegistration = function () {
     return;
   }
 
-  // 1. HENTIKAN TIMER 10 DETIK (Mencegah Bentrok)
-  if (inactivityTimer) {
-    clearTimeout(inactivityTimer);
-    console.log('[Nav] Timer dihentikan sebelum pindah halaman');
-  }
-
-  // 2. SIMPAN DATA KE SESSION STORAGE
   sessionStorage.setItem(
     'selectedNPSN',
     selectedSchool.npsn
@@ -323,13 +297,7 @@ window.goToRegistration = function () {
     'selectedSchoolName',
     selectedSchool.nama_sekolah
   );
-  
-  // Simpan objek lengkap agar halaman ppdb.html bisa pakai
-  sessionStorage.setItem('selectedSchoolFull', JSON.stringify(selectedSchool));
 
-  // 3. REDIRECT
-  console.log('[Nav] Mengarahkan ke ppdb.html...');
-  
   window.location.href =
     `/ppdb.html?npsn=${selectedSchool.npsn}`;
 };
