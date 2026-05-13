@@ -1255,3 +1255,138 @@ img {
 
   border-radius: 16px;
 }
+
+/* ==================== SECTION CONTAINER (Centering) ==================== */
+.school-section {
+  text-align: center; /* Kunci agar posisi di tengah */
+  padding: 40px 20px;
+}
+
+/* ==================== SEARCH WRAPPER (Lebar & Posisi) ==================== */
+.custom-search-container {
+  position: relative;
+  display: inline-block; /* Supaya lebar mengikuti isi, bisa di-center */
+  width: 100%;
+  max-width: 650px; /* Batas lebar maksimal agar rapi */
+  margin: 20px auto;
+  z-index: 10;
+}
+
+/* ==================== KOTAK SEARCH (Desain Keren Pill Shape) ==================== */
+.search-box-inner {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: 50px; /* Sudut membulat penuh (Kapsul) */
+  padding: 6px 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08); /* Bayangan halus */
+  transition: all 0.3s ease;
+}
+
+/* Efek saat input diklik */
+.search-box-inner:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+}
+
+/* Icon Kiri */
+.search-icon {
+  color: var(--text-muted);
+  font-size: 16px;
+  padding: 0 12px;
+}
+
+/* Input Teks */
+.custom-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 5px;
+  font-size: 15px;
+  color: var(--text-primary);
+  outline: none;
+  font-family: inherit;
+}
+
+/* ==================== TOMBOL (Integrated Design) ==================== */
+
+/* Tombol Lihat Daftar */
+.btn-lihat-daftar {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--primary);
+  border: none;
+  border-radius: 30px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.btn-lihat-daftar:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Tombol Cari */
+.btn-cari-kecil {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-cari-kecil:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* ==================== DROPDOWN LIST (Muncul di Bawah) ==================== */
+.school-list-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  max-height: 350px; /* Batas tinggi agar bisa di-scroll */
+  overflow-y: auto;
+  margin-top: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  list-style: none;
+  padding: 0;
+}
+
+/* Scrollbar cantik untuk dropdown */
+.school-list-dropdown::-webkit-scrollbar { width: 7px; }
+.school-list-dropdown::-webkit-scrollbar-track { background: #f1f1f1; }
+.school-list-dropdown::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+.school-list-dropdown::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* Item Sekolah */
+.school-list-dropdown li {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s;
+  color: var(--text-primary);
+}
+
+.school-list-dropdown li:last-child { border-bottom: none; }
+.school-list-dropdown li:hover { background: var(--bg-secondary); }
+.school-list-dropdown li strong { color: var(--primary); display: block; margin-bottom: 2px; }
+.school-list-dropdown li span { font-size: 12px; color: var(--text-muted); }

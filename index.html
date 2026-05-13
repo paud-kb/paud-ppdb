@@ -131,32 +131,39 @@
     <div class="skeleton skeleton-card"></div>
     <div class="skeleton skeleton-card"></div>
   </div>
-  <!-- School Dropdown -->
-  <div
-    class="school-dropdown-wrapper"
-    id="schoolGrid"
-    style="display:none;"
-  >
-    <!-- Search -->
-    <div class="school-search-box">
-      <i class="fas fa-search"></i>
-      <input
-        type="text"
-        id="schoolSearchInput"
-        placeholder="Ayo Cari Paud Favoritmu..."
-        autocomplete="off"
-      >
+    <!-- School Dropdown (Custom Autocomplete) -->
+    <div class="school-dropdown-wrapper" id="schoolGrid" style="display:none;">
+      <!-- Search Box dengan Tombol -->
+      <div class="custom-search-container">
+        <div class="search-box-inner">
+          <i class="fas fa-search search-icon"></i>
+          <input 
+            type="text" 
+            id="schoolSearchInput" 
+            class="custom-input"
+            placeholder="Ketik Nama / NPSN..." 
+            autocomplete="off"
+          >
+          
+          <!-- Tombol Lihat Daftar (Baru) -->
+          <button type="button" id="btnLihatSemua" class="btn-lihat-daftar">
+            <i class="fas fa-list"></i> Lihat Daftar
+          </button>
+
+          <button type="button" id="btnCariSekolah" class="btn-cari-kecil">
+            <i class="fas fa-search"></i> Cari
+          </button>
+        </div>
+        
+        <!-- Dropdown List (Scrollable) -->
+        <ul class="school-list-dropdown" id="schoolDropdownList" style="display:none;">
+          <!-- Data akan muncul disini -->
+        </ul>
+      </div>
+      
+      <input type="hidden" id="selectedNpsnInput">
     </div>
-    <!-- Select School -->
-    <select
-      id="schoolSelect"
-      class="school-dropdown"
-    >
-      <option value="">
-        -- Pilih Sekolah Tujuan --
-      </option>
-    </select>
-  </div>
+    
   <!-- Empty State -->
   <div
     class="empty-state"
