@@ -392,24 +392,39 @@
     }
 
     .sawer-header { text-align: center; margin-bottom: 24px; position: relative; z-index: 1; }
-    .sawer-emoji-row { font-size: 2.5rem; margin-bottom: 8px; animation: floatEmoji 3s ease-in-out infinite; }
-    @keyframes floatEmoji { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    /* Perbaikan: Display flex agar span rapi dan bisa diberi jarak */
+    .sawer-emoji-row { 
+      display: flex; 
+      justify-content: center; 
+      gap: 10px; /* Jarak antar emoji */
+      font-size: 2.5rem; 
+      margin-bottom: 8px; 
+    }
+
+    /* Target setiap emoji di dalam row */
+    .sawer-emoji-row span {
+      display: inline-block;
+      /* Durasi 4 detik agar lebih pelan dan santai */
+      animation: floatEmoji 4s ease-in-out infinite; 
+    }
+
+    /* Trik Gelombang: Emoji naik dengan jeda waktu berbeda */
+    /* Kopi mulai dulu */
+    .sawer-emoji-row span:nth-child(1) { animation-delay: 0s; }
+    /* Partypopper menyusul 0.7 detik kemudian */
+    .sawer-emoji-row span:nth-child(2) { animation-delay: 0.7s; }
+    /* Tangan menyusul 1.4 detik kemudian */
+    .sawer-emoji-row span:nth-child(3) { animation-delay: 1.4s; }
+
+    /* Gerakan Melayang (Keyframes) */
+    @keyframes floatEmoji { 
+      0%, 100% { transform: translateY(0); } 
+      50% { transform: translateY(-8px); } 
+    }
 
     .sawer-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; color: var(--warning); margin-bottom: 6px; }
     .sawer-subtitle { font-size: 0.94rem; color: var(--text-muted); font-style: italic; }
-
-    .sawer-body { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; position: relative; z-index: 1; }
-
-    .sawer-message { 
-      background: var(--bg-secondary); border-radius: 16px; padding: 22px;
-      border-left: 4px solid var(--warning);
-    }
-    .sawer-message p { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
-
-    .sawer-quote-box { 
-      background: rgba(245,158,11,0.08); border: 1px dashed rgba(245,158,11,0.2);
-      border-radius: 12px; padding: 14px 18px; font-style: italic; color: var(--text-muted); font-size: 0.88rem; text-align: center;
-    }
 
     .sawer-qris-wrapper { background: var(--bg-secondary); border-radius: 16px; padding: 22px; text-align: center; }
 
@@ -593,24 +608,24 @@
     </div>
 
     <section class="sawer-section" id="sawerSection">
-      <div class="sawer-header">
-        <div class="sawer-emoji-row">☕🎉🙏</div>
-        <h2 class="sawer-title">Sawer Buat Ngopi Pembuat WBS 💝</h2>
-        <p class="sawer-subtitle">Dari ketulusan hati, untuk semangat berkarya terus...</p>
-      </div>
       <div class="sawer-body">
-        <div class="sawer-message">
-          <p>Halo, <strong>Kawan Admin</strong> yang baik hati! 👋✨</p>
-          <p>Sistem PPDB ini lahir dari <em>banyak malam begadang</em>, <em>cangkir kopi yang tak terhitung</em>, dan semangat agar <strong>proses pendaftaran jadi lebih mudah</strong>.</p>
-          <p>Kalau merasa sistem ini membantu — boleh banget kok <strong>"ngopiin"</strong> saya! ☕</p>
-          <div class="sawer-quote-box">"Kode yang bagus seperti kopi enak — dibuat cinta, dinikmati senyuman."</div>
+        <!-- ================= GANTI DENGAN INI ================= -->
+        <div class="sawer-header">
+          <div class="sawer-emoji-row">
+              <span>☕</span>
+              <span>🎉</span>
+              <span>🙏</span>
+          </div>
+          <h2 class="sawer-title">Sawer Buat Ngopi Pembuat WBS 💝</h2>
+          <p class="sawer-subtitle">Dari ketulusan hati, untuk semangat berkarya terus...</p>
         </div>
+        <!-- ============================================== -->
         <div class="sawer-qris-wrapper">
           <div class="qris-image-container">
             <img src="/src/assets/qris-dana.jpg" alt="QRIS Dana" class="qris-img" id="dashboardQrisImg"
                  onerror="this.parentElement.innerHTML='<div style=\'text-align:center;padding:20px;\'><i class=\'fas fa-image\' style=\'font-size:2.5rem;color:var(--text-muted);\'></i><p style=\'color:var(--text-muted);margin-top:8px;\'>QRIS belum tersedia</p>'">
           </div>
-          <p class="qris-label"><i class="fas fa-qrcode"></i> Scan QRIS pakai <strong>DANA</strong> / e-Wallet</p>
+          <p class="qris-label"><i class="fas fa-qrcode"></i> Scan QRIS pakai <strong>DANA</strong> / No Dana 083895603395</p>
         </div>
       </div>
       <div class="sawer-footer">

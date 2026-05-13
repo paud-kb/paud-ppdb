@@ -69,19 +69,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==========================================
-// API REQUEST HELPER
+// API REQUEST HELPER (DITAMBAH TIMEOUT)
 // ==========================================
 
 /**
- * Fetch API dengan authorization header
+ * Fetch API dengan authorization header dan batas waktu (timeout)
  * @param {string} url - API endpoint
  * @param {Object} options - Fetch options
+ * @param {number} timeout - Batas waktu dalam ms (default 15000 / 15 detik)
  * @returns {Promise<Object>} - Response data
  */
-async function fetchAPI(url, options = {}) {
+async function fetchAPI(url, options = {}, timeout = 15000) {
     if (!SA.authToken) {
         throw new Error('No authentication token available');
     }
+
+    // Setup AbortController untuk timeout
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
 
     const headers = {
         'Content-Type': 'application/json',
@@ -89,18 +94,30 @@ async function fetchAPI(url, options = {}) {
         ...options.headers
     };
 
-    const response = await fetch(url, {
-        ...options,
-        headers
-    });
+    try {
+        const response = await fetch(url, {
+            ...options,
+            headers,
+            signal: controller.signal
+        });
 
-    const data = await response.json();
+        // Hapus timeout jika response sudah diterima
+        clearTimeout(id);
 
-    if (!response.ok) {
-        throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return data;
+    } catch (error) {
+        clearTimeout(id);
+        if (error.name === 'AbortError') {
+            throw new Error('Server merespon terlalu lama (Timeout). Silakan refresh halaman untuk mengecek status.');
+        }
+        throw error;
     }
-
-    return data;
 }
 
 // ==========================================
@@ -459,7 +476,7 @@ function checkPasswordStrength(pw) {
 }
 
 // ==========================================
-// APPROVE - EXECUTE (via API)
+// APPROVE - EXECUTE (via API) - DIOPTIMALKAN
 // ==========================================
 async function executeApprove() {
     if (!SA.currentTarget) {
@@ -487,17 +504,17 @@ async function executeApprove() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-        // Hash password dengan bcrypt
+        // 1. Hash password
         saToast('Meng-hash password...', 'info');
         const passwordHash = await hashPassword(password);
         console.log('Password hashed successfully');
 
-        // Panggil API approve-request dengan password hash
+        // 2. Panggil API approve-request (Dengan timeout default 15 detik)
         const result = await fetchAPI('/api/admin/approve-request', {
             method: 'POST',
             body: JSON.stringify({
                 requestId: id,
-                passwordHash: passwordHash  // Kirim password yang sudah di-hash
+                passwordHash: passwordHash
             })
         });
 
@@ -505,18 +522,29 @@ async function executeApprove() {
             throw new Error(result.error || 'Gagal menyetujui request');
         }
 
-        // Tampilkan password result (gunakan password dari input, bukan dari backend)
+        // 3. TUTUP Modal Approve
+        closeApproveModal();
+
+        // 4. TAMPILKAN PASSWORD HASIL (Langsung muncul)
         showPasswordResult(request, password);
 
-        // Reload data
-        await loadRequests();
+        // 5. REFRESH DATA (Dijalankan di background)
+        // Kita tidak pakai await agar user tidak menunggu reload tabel
+        loadRequests().catch(err => {
+            console.error('[SA] Refresh table error:', err);
+            // Jika reload gagal, kita beri notifikasi kecil saja
+            saToast('Mohon refresh halaman untuk melihat data terbaru', 'info');
+        });
 
     } catch (err) {
         console.error('[SA] executeApprove error:', err);
-        saToast('Gagal menyetujui: ' + err.message, 'error');
-
+        
+        // Reset tombol jika error
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-check-circle"></i> Ya, Setujui!';
+        
+        // Tampilkan pesan error
+        saToast('Gagal menyetujui: ' + err.message, 'error');
     }
 }
 window.executeApprove = executeApprove;
