@@ -576,32 +576,24 @@ img {
 
   /* dibuat 2 kolom agar hemat tinggi */
   grid-template-columns: repeat(2, 1fr);
-
   gap: 10px;
-
   max-width: 420px;
-
   margin: 0 auto;
 }
 
 .illustration-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-
   border-radius: 14px;
 
   /* diperkecil */
   padding: 12px 10px;
-
   text-align: center;
-
   transition: all var(--transition-normal);
-
   cursor: default;
 
   /* tinggi minimum diperkecil */
   min-height: 82px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -610,46 +602,40 @@ img {
 
 .illustration-card:hover {
   transform: translateY(-3px);
-
   border-color: var(--accent);
-
   box-shadow: var(--shadow-glow);
-
   background: var(--bg-card-hover);
 }
 
-.illustration-icon {
-
-  /* icon diperkecil */
+.illustration-icon{
   font-size: 1.5rem;
-
   margin-bottom: 6px;
-
   display: block;
-
-  animation: bounce-soft 3s ease-in-out infinite;
+  animation: float-soft 5s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-.illustration-card:nth-child(2) .illustration-icon {
-  animation-delay: -0.5s;
-}
-
-.illustration-card:nth-child(3) .illustration-icon {
+/* Delay beda-beda */
+.illustration-card:nth-child(2) .illustration-icon{
   animation-delay: -1s;
 }
 
-.illustration-card:nth-child(4) .illustration-icon {
-  animation-delay: -1.5s;
+.illustration-card:nth-child(3) .illustration-icon{
+  animation-delay: -2s;
 }
 
-@keyframes bounce-soft {
+.illustration-card:nth-child(4) .illustration-icon{
+  animation-delay: -3s;
+}
 
-  0%, 100% {
-    transform: translateY(0);
+/* SUPER SMOOTH FLOAT */
+@keyframes float-soft{
+  0%,100%{
+    transform: translate3d(0,0,0);
   }
-
-  50% {
-    transform: translateY(-5px);
+  50%{
+    transform: translate3d(0,-8px,0);
   }
 }
 
@@ -1493,3 +1479,66 @@ img {
 .school-list-dropdown li:hover { background: var(--bg-secondary); }
 .school-list-dropdown li strong { color: var(--primary); display: block; margin-bottom: 2px; }
 .school-list-dropdown li span { font-size: 12px; color: var(--text-muted); }
+
+.btn-home{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+
+  width:100%;
+  max-width:420px;
+
+  margin:26px auto 0;
+
+  padding:18px 28px;
+
+  background:var(--gradient-btn-secondary);
+
+  color:white;
+
+  border:none;
+  border-radius:22px;
+
+  font-size:1.12rem;
+  font-weight:700;
+  font-family:var(--font-heading);
+
+  cursor:pointer;
+
+  box-shadow:
+    0 10px 28px rgba(59, 130, 246, 0.28);
+
+  transition:all var(--transition-normal);
+}
+
+/* icon */
+.btn-home i{
+  font-size:1.2rem;
+}
+
+/* hover */
+.btn-home:hover{
+  transform:translateY(-3px);
+
+  box-shadow:
+    0 14px 32px rgba(59, 130, 246, 0.40);
+}
+
+/* click effect */
+.btn-home:active{
+  transform:scale(0.98);
+}
+
+/* mobile */
+@media(max-width:768px){
+
+  .btn-home{
+    padding:20px 24px;
+
+    font-size:1.08rem;
+
+    border-radius:24px;
+  }
+
+}

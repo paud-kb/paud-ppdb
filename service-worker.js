@@ -12,7 +12,7 @@
  * =====================================================
  */
 
-const CACHE_NAME = 'ppdb-paud-v1.0.3';
+const CACHE_NAME = 'ppdb-paud-v1.0.4';
 const OFFLINE_URL = '/offline.html';
 
 // ==========================================
