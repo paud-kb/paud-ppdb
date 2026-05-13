@@ -28,6 +28,8 @@
   --text-accent: #10b981;
   
   /* === ACCENT COLORS === */
+  --primary: #10b981;
+  --primary-dark: #059669;
   --accent: #10b981;
   --accent-hover: #059669;
   --accent-light: #34d399;
@@ -667,9 +669,10 @@ img {
    SCHOOL SELECTION SECTION
    ========================================== */
 .school-section {
-  padding: 35px 16px 70px;
+  padding: 35px 20px 70px;
   max-width: 1200px;
   margin: 0 auto;
+  text-align: center;
 }
 
 .section-title {
@@ -1171,26 +1174,28 @@ img {
 }
 
 .school-search-box input{
+  color: var(--text-primary);
   width:100%;
   height:52px;
-  border:none;
+  border: 1px solid var(--border-color);
   border-radius:16px;
   padding:0 16px 0 48px;
   font-size:0.95rem;
-  background:#fff;
+  background: var(--bg-card);
   box-shadow:0 4px 16px rgba(0,0,0,0.08);
   outline:none;
 }
 
 .school-dropdown{
+  color: var(--text-primary);
   width:100%;
   height:56px;
-  border:none;
+  border: 1px solid var(--border-color);
   border-radius:16px;
   padding:0 16px;
   font-size:0.95rem;
   font-weight:600;
-  background:#fff;
+  background: var(--bg-card);
   box-shadow:0 4px 16px rgba(0,0,0,0.08);
   outline:none;
   color:#0f172a;
@@ -1256,12 +1261,6 @@ img {
   border-radius: 16px;
 }
 
-/* ==================== SECTION CONTAINER (Centering) ==================== */
-.school-section {
-  text-align: center; /* Kunci agar posisi di tengah */
-  padding: 40px 20px;
-}
-
 /* ==================== SEARCH WRAPPER (Lebar & Posisi) ==================== */
 .custom-search-container {
   position: relative;
@@ -1309,26 +1308,130 @@ img {
   font-family: inherit;
 }
 
-/* ==================== TOMBOL (Integrated Design) ==================== */
+/* =========================================
+   TABLE RESPONSIVE
+========================================= */
 
-/* Tombol Lihat Daftar */
-.btn-lihat-daftar {
-  background: rgba(139, 92, 246, 0.1);
-  color: var(--primary);
-  border: none;
-  border-radius: 30px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-  margin-right: 6px;
-  white-space: nowrap;
+.table-responsive{
+    padding-bottom:10px;
+    width:100%;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    border-radius:20px;
 }
 
-.btn-lihat-daftar:hover {
-  background: var(--primary);
-  color: white;
+/* =========================================
+   SCROLLBAR TABLE MOBILE
+========================================= */
+
+.table-responsive::-webkit-scrollbar{
+    height:14px;
+}
+
+.table-responsive::-webkit-scrollbar-track{
+    background:rgba(255,255,255,0.08);
+    border-radius:999px;
+    margin:0 10px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb{
+    background:linear-gradient(
+        90deg,
+        var(--primary),
+        var(--accent)
+    );
+    border-radius:999px;
+    border:3px solid rgba(255,255,255,0.08);
+    min-width:80px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover{
+    background:var(--primary-dark);
+}
+
+/* table minimal width */
+.data-table{
+    width:100%;
+    min-width:1100px;
+}
+
+/* =========================================
+   TOOLBAR MOBILE
+========================================= */
+@media(max-width:768px){
+    .table-toolbar{
+        display:flex;
+        flex-direction:column;
+        align-items:stretch;
+        gap:14px;
+    }
+    .toolbar-title{
+        font-size:1rem;
+    }
+    .search-box{
+        width:100%;
+    }
+    .search-box input{
+        width:100%;
+        font-size:0.9rem;
+    }
+}
+
+/* =========================================
+   MOBILE TABLE
+========================================= */
+
+@media(max-width:768px){
+    .table-container{
+        padding:16px;
+        overflow:hidden;
+    }
+    .data-table th,
+    .data-table td{
+        white-space:nowrap;
+        font-size:0.85rem;
+        padding:12px 14px;
+    }
+}
+
+/* =========================================
+   SMALL PHONE
+========================================= */
+@media(max-width:480px){
+    .data-table{
+        min-width:950px;
+    }
+}
+
+/* ==================== CONTAINER TOMBOL DI BAWAH ==================== */
+.search-actions-below {
+  margin-top: 15px;
+  text-align: center; /* Agar tombol berada di tengah */
+}
+
+/* Tombol Lihat Daftar */
+.btn-lihat-daftar-full {
+  background: transparent;
+  color: var(--primary);
+  border: 1px dashed var(--primary); /* Garis putus-putus agar terlihat opsional */
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%; /* Tombol memenuhi lebar container search */
+  max-width: 400px; /* Tapi tidak terlalu lebar */
+  justify-content: center;
+}
+
+.btn-lihat-daftar-full:hover {
+  background: rgba(139, 92, 246, 0.05);
+  border-color: var(--primary-dark);
+  transform: translateY(-2px); /* Sedikit naik saat di-hover */
 }
 
 /* Tombol Cari */

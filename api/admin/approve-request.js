@@ -1,204 +1,260 @@
-const { createClient } = require('@supabase/supabase-js');
+// ==========================================
+// REQUEST BODY
+// ==========================================
+const { requestId, password, passwordHash } = req.body;
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing required environment variables');
+if (!requestId || !password || !passwordHash) {
+  return res.status(400).json({
+    error: 'Missing requestId, password, or passwordHash'
+  });
 }
 
-const supabaseAdmin = createClient(supabaseUrl, supabaseKey);
+if (password.length < 6) {
+  return res.status(400).json({
+    error: 'Password minimal 6 karakter'
+  });
+}
 
-module.exports = async (req, res) => {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+console.log('Processing approval for request:', requestId);
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+// ==========================================
+// FETCH REQUEST DATA
+// ==========================================
+const { data: requestData, error: requestError } =
+  await supabaseAdmin
+    .from('admin_requests')
+    .select('*')
+    .eq('id', requestId)
+    .single();
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+if (requestError || !requestData) {
+  console.error('Request not found:', requestError);
 
-  try {
-    // 1. AUTHENTICATION CHECK
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized - No token provided' });
-    }
+  return res.status(404).json({
+    error: 'Request not found'
+  });
+}
 
-    const token = authHeader.substring(7);
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+if (requestData.status !== 'pending') {
+  return res.status(400).json({
+    error: 'Request has already been processed'
+  });
+}
 
-    if (authError || !user) {
-      return res.status(401).json({ error: 'Unauthorized - Invalid token' });
-    }
+// ==========================================
+// PRE-CHECK USERNAME
+// ==========================================
+const { data: existingUser } =
+  await supabaseAdmin
+    .from('users')
+    .select('id')
+    .eq('username', requestData.username_desired)
+    .single();
 
-    // Check super admin role
-    const { data: adminData, error: adminError } = await supabaseAdmin
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
+if (existingUser) {
+  return res.status(400).json({
+    error: 'Username already exists',
+    username: requestData.username_desired
+  });
+}
 
-    if (adminError || !adminData || adminData.role !== 'super_admin') {
-      return res.status(403).json({ error: 'Forbidden - Not a super admin' });
-    }
+// ==========================================
+// PRE-CHECK EMAIL USERS TABLE
+// ==========================================
+const { data: existingEmailUser } =
+  await supabaseAdmin
+    .from('users')
+    .select('id')
+    .eq('email', requestData.email)
+    .single();
 
-    const { requestId, passwordHash } = req.body;
+if (existingEmailUser) {
+  return res.status(400).json({
+    error: 'Email already exists in users table',
+    email: requestData.email
+  });
+}
 
-    if (!requestId || !passwordHash) {
-      return res.status(400).json({ error: 'Missing requestId or passwordHash' });
-    }
+// ==========================================
+// PRE-CHECK AUTH USER
+// ==========================================
+const { data: authList } =
+  await supabaseAdmin.auth.admin.listUsers();
 
-    console.log('Processing approval for request:', requestId);
+const authExists =
+  authList?.users?.find(
+    u => u.email?.toLowerCase() === requestData.email.toLowerCase()
+  );
 
-    // 2. FETCH REQUEST DATA
-    const { data: requestData, error: requestError } = await supabaseAdmin
-      .from('admin_requests')
-      .select('*')
-      .eq('id', requestId)
-      .single();
+if (authExists) {
+  return res.status(400).json({
+    error: 'Email already registered in authentication',
+    email: requestData.email
+  });
+}
 
-    if (requestError || !requestData) {
-      console.error('Request not found:', requestError);
-      return res.status(404).json({ error: 'Request not found' });
-    }
+// ==========================================
+// PRE-CHECK NPSN
+// ==========================================
+const { data: existingSchoolUser } =
+  await supabaseAdmin
+    .from('users')
+    .select('id, npsn')
+    .eq('npsn', requestData.npsn)
+    .single();
 
-    if (requestData.status !== 'pending') {
-      return res.status(400).json({ error: 'Request has already been processed' });
-    }
+if (existingSchoolUser) {
+  return res.status(400).json({
+    error: 'School already has admin account',
+    npsn: requestData.npsn
+  });
+}
 
-    // ==========================================
-    // 3. PRE-CHECKS (Unikness)
-    // ==========================================
+// ==========================================
+// CREATE SCHOOL
+// ==========================================
+const { data: schoolData, error: schoolCheckError } =
+  await supabaseAdmin
+    .from('schools')
+    .select('*')
+    .eq('npsn', requestData.npsn)
+    .single();
 
-    // Check Username unik di tabel users
-    const { data: existingUser } = await supabaseAdmin
-      .from('users')
-      .select('id')
-      .eq('username', requestData.username_desired)
-      .single();
+let isSchoolNew = false;
 
-    if (existingUser) {
-      return res.status(400).json({ 
-        error: 'Username already exists in system',
-        username: requestData.username_desired 
-      });
-    }
+if (!schoolData && schoolCheckError?.code === 'PGRST116') {
 
-    // Check NPSN di tabel users (Constraint: users_npsn_unique)
-    // Karena satu sekolah hanya boleh punya 1 admin (berdasarkan unique key)
-    const { data: existingSchoolUser } = await supabaseAdmin
-      .from('users')
-      .select('id, npsn')
-      .eq('npsn', requestData.npsn)
-      .single();
+  console.log('Creating school:', requestData.npsn);
 
-    if (existingSchoolUser) {
-      return res.status(400).json({ 
-        error: 'School (NPSN) already has an admin account',
-        npsn: requestData.npsn 
-      });
-    }
-
-    // ==========================================
-    // 4. CREATE SCHOOL (Wajib Duluan karena Foreign Key)
-    // ==========================================
-    const { data: schoolData, error: schoolCheckError } = await supabaseAdmin
+  const { error: schoolInsertError } =
+    await supabaseAdmin
       .from('schools')
-      .select('*')
-      .eq('npsn', requestData.npsn)
-      .single();
-
-    let isSchoolNew = false;
-
-    if (!schoolData && schoolCheckError?.code === 'PGRST116') {
-      // Sekolah belum ada, buat baru
-      console.log('Creating new school for NPSN:', requestData.npsn);
-      const { error: schoolInsertError } = await supabaseAdmin
-        .from('schools')
-        .insert([{
-          npsn: requestData.npsn,
-          nama_sekolah: requestData.nama_sekolah,
-          password_hash: passwordHash, // Password sama dengan admin
-          is_active: true
-        }]);
-
-      if (schoolInsertError) {
-        console.error('Error creating school:', schoolInsertError);
-        return res.status(500).json({ error: 'Failed to create school', details: schoolInsertError.message });
-      }
-      isSchoolNew = true;
-    } else if (schoolCheckError) {
-      console.error('Error checking school:', schoolCheckError);
-      return res.status(500).json({ error: 'Database error checking school' });
-    } else {
-      console.log('School already exists for NPSN:', requestData.npsn);
-    }
-
-    // ==========================================
-    // 5. CREATE USER (Baru bisa dilakukan setelah School ada)
-    // ==========================================
-    console.log('Creating user...');
-    const { error: userInsertError } = await supabaseAdmin
-      .from('users')
       .insert([{
-        username: requestData.username_desired,
+        npsn: requestData.npsn,
+        nama_sekolah: requestData.nama_sekolah,
         password_hash: passwordHash,
-        full_name: requestData.nama_lengkap, // Map ke kolom database
-        email: requestData.email,
-        no_hp: requestData.no_hp,
-        role: 'admin',
-        npsn: requestData.npsn, // Wajib ada karena FK
-        is_active: true,
-        is_verified: false,
-        created_by: user.id
-        // created_at & updated_at akan auto generate dari database default
+        is_active: true
       }]);
 
-    if (userInsertError) {
-      console.error('Error creating user (Full Details):', userInsertError);
-      return res.status(500).json({ 
-        error: 'Failed to create user record',
-        details: userInsertError.message,
-        hint: userInsertError.hint 
-      });
-    }
+  if (schoolInsertError) {
+    console.error('School create error:', schoolInsertError);
 
-    console.log('User created successfully');
-
-    // ==========================================
-    // 6. UPDATE REQUEST STATUS
-    // ==========================================
-    const { error: updateError } = await supabaseAdmin
-      .from('admin_requests')
-      .update({
-        status: 'approved',
-        reviewed_by: user.id,
-        reviewed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', requestId);
-
-    if (updateError) {
-      console.error('Error updating request status:', updateError);
-      // Jangan return error 500 jika user berhasil dibuat, tapi log error saja
-      // Atau jika ingin strict, bisa return 500 di sini
-    }
-
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Admin approved successfully',
-      school_created: isSchoolNew,
-      npsn: requestData.npsn
+    return res.status(500).json({
+      error: 'Failed to create school',
+      details: schoolInsertError.message
     });
-
-  } catch (error) {
-    console.error('Error in approve-request API:', error);
-    return res.status(500).json({ error: 'Internal server error', details: error.message });
   }
-};
+
+  isSchoolNew = true;
+}
+
+// ==========================================
+// CREATE AUTH USER
+// ==========================================
+console.log('Creating auth user...');
+
+const {
+  data: authData,
+  error: authCreateError
+} = await supabaseAdmin.auth.admin.createUser({
+  email: requestData.email,
+  password: password,
+  email_confirm: true
+});
+
+if (authCreateError) {
+
+  console.error('Auth create error:', authCreateError);
+
+  // rollback school jika baru dibuat
+  if (isSchoolNew) {
+    await supabaseAdmin
+      .from('schools')
+      .delete()
+      .eq('npsn', requestData.npsn);
+  }
+
+  return res.status(500).json({
+    error: 'Failed to create auth user',
+    details: authCreateError.message
+  });
+}
+
+const authUserId = authData.user.id;
+
+console.log('Auth user created:', authUserId);
+
+// ==========================================
+// CREATE USERS TABLE
+// ==========================================
+console.log('Creating users table record...');
+
+const { error: userInsertError } =
+  await supabaseAdmin
+    .from('users')
+    .insert([{
+      id: authUserId,
+      username: requestData.username_desired,
+      password_hash: passwordHash,
+      full_name: requestData.nama_lengkap,
+      email: requestData.email,
+      no_hp: requestData.no_hp,
+      role: 'admin',
+      npsn: requestData.npsn,
+      is_active: true,
+      is_verified: false,
+      created_by: user.id
+    }]);
+
+if (userInsertError) {
+
+  console.error('Users insert error:', userInsertError);
+
+  // rollback auth user
+  await supabaseAdmin.auth.admin.deleteUser(authUserId);
+
+  // rollback school
+  if (isSchoolNew) {
+    await supabaseAdmin
+      .from('schools')
+      .delete()
+      .eq('npsn', requestData.npsn);
+  }
+
+  return res.status(500).json({
+    error: 'Failed to create user table record',
+    details: userInsertError.message
+  });
+}
+
+console.log('Users table success');
+
+// ==========================================
+// UPDATE REQUEST STATUS
+// ==========================================
+const { error: updateError } =
+  await supabaseAdmin
+    .from('admin_requests')
+    .update({
+      status: 'approved',
+      reviewed_by: user.id,
+      reviewed_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', requestId);
+
+if (updateError) {
+  console.error('Update request status error:', updateError);
+}
+
+// ==========================================
+// SUCCESS
+// ==========================================
+return res.status(200).json({
+  success: true,
+  message: 'Admin approved successfully',
+  school_created: isSchoolNew,
+  auth_user_created: true,
+  auth_user_id: authUserId,
+  npsn: requestData.npsn
+});

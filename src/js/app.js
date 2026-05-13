@@ -172,12 +172,12 @@ function initSchoolSearch() {
   const resetTimer = () => {
     clearTimeout(inactivityTimer);
     inactivityTimer = setTimeout(() => {
-      console.log('[Timer] Reset input (10 detik)');
+      console.log('[Timer] Reset input (30 detik)');
       schoolSearchInput.value = '';
       schoolDropdownList.style.display = 'none';
       schoolDropdownList.innerHTML = '';
       if (selectedSchool) showToast('Waktu pencarian habis', 'info');
-    }, 10000);
+    }, 30000);
   };
 
   // Fungsi Filter & Render List

@@ -1088,7 +1088,6 @@
                     <i class="fas fa-user-shield" style="color:var(--accent);"></i>
                     User Management
                 </h1>
-                <span class="top-header-badge"><i class="fas fa-shield-alt"></i> Super Admin</span>
             </div>
             <div class="top-header-right">
                 <div class="header-user-btn" id="headerUserBtn" onclick="toggleUserMenu()">
@@ -1148,43 +1147,52 @@
             </article>
         </section>
 
-        <!-- Table Section -->
-        <section class="table-container">
-            <div class="table-toolbar">
-                <div class="toolbar-title">
-                    <i class="fas fa-list" style="color:var(--accent);"></i>
-                    Daftar Pengajuan Akun
-                </div>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="saSearch" placeholder="Cari berdasarkan nama, email, username, atau NPSN..." autocomplete="off">
-                </div>
-            </div>
+<!-- Table Section -->
+<section class="table-container">
+    <div class="table-toolbar">
+        <div class="toolbar-title">
+            <i class="fas fa-list" style="color:var(--accent);"></i>
+            Daftar Pengajuan Akun
+        </div>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input
+                type="text"
+                id="saSearch"
+                placeholder="Cari nama, email, username, atau NPSN..."
+                autocomplete="off"
+            >
+        </div>
+    </div>
 
-            <!-- Empty State -->
-            <div class="empty-state" id="emptyState" style="display:none;">
-                <i class="fas fa-inbox"></i>
-                <h3>Tidak Ada Permintaan</h3>
-                <p>Belum ada pengajuan akun operator baru.</p>
-            </div>
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+        <i class="fas fa-inbox"></i>
+        <h3>Tidak Ada Permintaan</h3>
+        <p>Belum ada pengajuan akun operator baru.</p>
+    </div>
 
-            <!-- Data Table -->
-            <table class="data-table" id="requestTable">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Tanggal</th>
-                        <th>Nama Lengkap</th>
-                        <th>Email</th>
-                        <th>Sekolah</th>
-                        <th>Username Diinginkan</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="requestTableBody"></tbody>
-            </table>
-        </section>
+    <!-- TABLE RESPONSIVE WRAPPER -->
+    <div class="table-responsive">
+        <!-- Data Table -->
+        <table class="data-table" id="requestTable">
+
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>Nama Lengkap</th>
+                    <th>Email</th>
+                    <th>Sekolah</th>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="requestTableBody"></tbody>
+        </table>
+    </div>
+</section>
 
     </main>
 

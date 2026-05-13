@@ -131,10 +131,12 @@
     <div class="skeleton skeleton-card"></div>
     <div class="skeleton skeleton-card"></div>
   </div>
-    <!-- School Dropdown (Custom Autocomplete) -->
+
+      <!-- School Dropdown (Custom Autocomplete) -->
     <div class="school-dropdown-wrapper" id="schoolGrid" style="display:none;">
-      <!-- Search Box dengan Tombol -->
       <div class="custom-search-container">
+        
+        <!-- Search Box (Hanya Input + Tombol Cari) -->
         <div class="search-box-inner">
           <i class="fas fa-search search-icon"></i>
           <input 
@@ -145,20 +147,21 @@
             autocomplete="off"
           >
           
-          <!-- Tombol Lihat Daftar (Baru) -->
-          <button type="button" id="btnLihatSemua" class="btn-lihat-daftar">
-            <i class="fas fa-list"></i> Lihat Daftar
-          </button>
-
+          <!-- Hanya Tombol Cari yang di dalam -->
           <button type="button" id="btnCariSekolah" class="btn-cari-kecil">
             <i class="fas fa-search"></i> Cari
           </button>
         </div>
         
-        <!-- Dropdown List (Scrollable) -->
-        <ul class="school-list-dropdown" id="schoolDropdownList" style="display:none;">
-          <!-- Data akan muncul disini -->
-        </ul>
+        <!-- Tombol Lihat Daftar (Pindah ke Bawah) -->
+        <div class="search-actions-below">
+          <button type="button" id="btnLihatSemua" class="btn-lihat-daftar-full">
+            <i class="fas fa-list"></i> Lihat Daftar Semua Sekolah
+          </button>
+        </div>
+
+        <!-- Dropdown List -->
+        <ul class="school-list-dropdown" id="schoolDropdownList" style="display:none;"></ul>
       </div>
       
       <input type="hidden" id="selectedNpsnInput">

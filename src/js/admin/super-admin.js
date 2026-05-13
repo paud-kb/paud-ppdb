@@ -476,7 +476,7 @@ function checkPasswordStrength(pw) {
 }
 
 // ==========================================
-// APPROVE - EXECUTE (via API) - DIOPTIMALKAN
+// APPROVE - EXECUTE (via API) - FIX AUTH SUPABASE
 // ==========================================
 async function executeApprove() {
     if (!SA.currentTarget) {
@@ -484,69 +484,193 @@ async function executeApprove() {
         return;
     }
 
-    const password = document.getElementById('approvePassword').value.trim();
+    const passwordInput = document.getElementById('approvePassword');
 
-    if (!password) {
-        saToast('Password wajib diisi!', 'warning');
-        document.getElementById('approvePassword').focus();
+    if (!passwordInput) {
+        saToast('Input password tidak ditemukan!', 'error');
         return;
     }
+
+    const password = passwordInput.value.trim();
+
+    // ==========================================
+    // VALIDATION
+    // ==========================================
+    if (!password) {
+        saToast('Password wajib diisi!', 'warning');
+        passwordInput.focus();
+        return;
+    }
+
     if (password.length < 6) {
         saToast('Password minimal 6 karakter!', 'warning');
-        document.getElementById('approvePassword').focus();
+        passwordInput.focus();
         return;
     }
 
     const { id, request } = SA.currentTarget;
+
     const btn = document.getElementById('confirmApproveBtn');
 
+    if (!btn) {
+        saToast('Tombol approve tidak ditemukan!', 'error');
+        return;
+    }
+
     try {
+
+        // ==========================================
+        // UI LOADING
+        // ==========================================
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-        // 1. Hash password
-        saToast('Meng-hash password...', 'info');
+        btn.innerHTML = `
+            <i class="fas fa-spinner fa-spin"></i>
+            Memproses Approval...
+        `;
+
+        // ==========================================
+        // HASH PASSWORD
+        // ==========================================
+        saToast('Mengamankan password...', 'info');
+
         const passwordHash = await hashPassword(password);
-        console.log('Password hashed successfully');
 
-        // 2. Panggil API approve-request (Dengan timeout default 15 detik)
-        const result = await fetchAPI('/api/admin/approve-request', {
-            method: 'POST',
-            body: JSON.stringify({
-                requestId: id,
-                passwordHash: passwordHash
-            })
-        });
-
-        if (!result.success) {
-            throw new Error(result.error || 'Gagal menyetujui request');
+        if (!passwordHash) {
+            throw new Error('Gagal membuat hash password');
         }
 
-        // 3. TUTUP Modal Approve
-        closeApproveModal();
+        console.log('[SA] Password hashed successfully');
 
-        // 4. TAMPILKAN PASSWORD HASIL (Langsung muncul)
-        showPasswordResult(request, password);
+        // ==========================================
+        // PREPARE REQUEST PAYLOAD
+        // ==========================================
+        const payload = {
+            requestId: id,
+            password: password,
+            passwordHash: passwordHash
+        };
 
-        // 5. REFRESH DATA (Dijalankan di background)
-        // Kita tidak pakai await agar user tidak menunggu reload tabel
-        loadRequests().catch(err => {
-            console.error('[SA] Refresh table error:', err);
-            // Jika reload gagal, kita beri notifikasi kecil saja
-            saToast('Mohon refresh halaman untuk melihat data terbaru', 'info');
+        console.log('[SA] Sending approve request:', {
+            requestId: id,
+            username: request?.username_desired,
+            email: request?.email,
+            npsn: request?.npsn
         });
 
+        // ==========================================
+        // CALL API
+        // ==========================================
+        saToast('Membuat akun sekolah...', 'info');
+
+        const result = await fetchAPI('/api/admin/approve-request', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+
+        console.log('[SA] API Result:', result);
+
+        // ==========================================
+        // HANDLE ERROR
+        // ==========================================
+        if (!result.success) {
+
+            let errorMessage =
+                result.error ||
+                result.details ||
+                'Gagal menyetujui request';
+
+            throw new Error(errorMessage);
+        }
+
+        // ==========================================
+        // SUCCESS
+        // ==========================================
+        saToast('Admin berhasil disetujui!', 'success');
+
+        // ==========================================
+        // CLOSE APPROVE MODAL
+        // ==========================================
+        closeApproveModal();
+
+        // ==========================================
+        // SHOW PASSWORD RESULT MODAL
+        // ==========================================
+        showPasswordResult(request, password);
+
+        // ==========================================
+        // REFRESH TABLE (BACKGROUND)
+        // ==========================================
+        loadRequests()
+            .then(() => {
+                console.log('[SA] Requests reloaded');
+            })
+            .catch((reloadErr) => {
+                console.error('[SA] Reload error:', reloadErr);
+
+                saToast(
+                    'Data berhasil disimpan, namun tabel gagal direfresh',
+                    'warning'
+                );
+            });
+
     } catch (err) {
+
         console.error('[SA] executeApprove error:', err);
-        
-        // Reset tombol jika error
+
+        // ==========================================
+        // RESET BUTTON
+        // ==========================================
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check-circle"></i> Ya, Setujui!';
-        
-        // Tampilkan pesan error
-        saToast('Gagal menyetujui: ' + err.message, 'error');
+
+        btn.innerHTML = `
+            <i class="fas fa-check-circle"></i>
+            Ya, Setujui!
+        `;
+
+        // ==========================================
+        // FRIENDLY ERROR MESSAGE
+        // ==========================================
+        let errorMessage = err.message || 'Unknown error';
+
+        // Supabase Auth
+        if (errorMessage.includes('already registered')) {
+            errorMessage = 'Email sudah terdaftar di Authentication Supabase';
+        }
+
+        // Username
+        else if (errorMessage.includes('Username already exists')) {
+            errorMessage = 'Username sudah digunakan';
+        }
+
+        // NPSN
+        else if (errorMessage.includes('already has an admin')) {
+            errorMessage = 'Sekolah ini sudah memiliki akun admin';
+        }
+
+        // Network
+        else if (
+            errorMessage.includes('Failed to fetch') ||
+            errorMessage.includes('NetworkError')
+        ) {
+            errorMessage = 'Koneksi ke server gagal';
+        }
+
+        // Auth
+        else if (
+            errorMessage.includes('Unauthorized') ||
+            errorMessage.includes('Invalid token')
+        ) {
+            errorMessage = 'Session login habis, silakan login ulang';
+        }
+
+        // ==========================================
+        // SHOW ERROR
+        // ==========================================
+        saToast('Gagal approve: ' + errorMessage, 'error');
     }
 }
+
 window.executeApprove = executeApprove;
 
 // ==========================================
